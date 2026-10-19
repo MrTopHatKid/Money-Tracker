@@ -3,445 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Money Tracker</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
-:root {
-  color-scheme: dark;
-  --bg: #0b1120;
-  --card: #151e30;
-  --line: #28344c;
-  --text: #edf2ff;
-  --muted: #95a3bd;
-  --green: #62e5b0;
-  --red: #ff8199;
-  --blue: #829bff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+  :root {
+    color-scheme: dark;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+  }
 
-* { box-sizing: border-box; }
+  * { box-sizing: border-box; }
 
-body {
-  margin: 0;
-  background:
-    radial-gradient(ellipse at top left, #21325d66, transparent 60%),
-    var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
+  body {
+    margin: 0;
+    padding: 20px 12px;
+  }
 
-button, input { font: inherit; }
-button { cursor: pointer; }
-button:disabled { opacity: .4; cursor: not-allowed; }
+  main {
+    max-width: 720px;
+    margin: auto;
+    padding: 22px;
+    background: #1e293b;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px #0004;
+  }
 
-.app {
-  max-width: 860px;
-  margin: auto;
-  padding: 24px 18px 50px;
-}
+  h1 { margin: 0 0 8px; font-size: 26px; }
+  h2 { font-size: 19px; margin-top: 24px; }
+  h3 { font-size: 16px; }
 
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 24px;
-}
+  .muted, small {
+    color: #94a3b8;
+    line-height: 1.5;
+  }
 
-h1 { font-size: 24px; margin: 0 0 5px; }
-h2 { font-size: 17px; margin: 0; }
-p { line-height: 1.6; }
-.muted { color: var(--muted); }
-.small { font-size: 12px; }
+  .balance {
+    font-size: clamp(36px, 10vw, 56px);
+    font-weight: 750;
+    margin: 18px 0;
+    overflow-wrap: anywhere;
+  }
 
-.badge {
-  background: #263451;
-  padding: 8px 12px;
-  border-radius: 99px;
-  font-size: 12px;
-  white-space: nowrap;
-}
+  .positive { color: #4ade80; }
+  .negative { color: #fb7185; }
+  .zero { color: #facc15; }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  padding: 22px;
-  margin-bottom: 18px;
-}
+  .panel, .graph-card, .edit-entry {
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 16px 0;
+    overflow-wrap: anywhere;
+  }
 
-.hero {
-  background: linear-gradient(135deg, #223760, #18243d 65%);
-  position: relative;
-  overflow: hidden;
-}
+  .panel { line-height: 1.8; }
 
-.balance {
-  font-size: clamp(42px, 9vw, 66px);
-  font-weight: 760;
-  letter-spacing: -2px;
-  margin: 12px 0;
-  overflow-wrap: anywhere;
-}
+  #notice {
+    display: none;
+    background: #7f1d1d;
+    color: #fecaca;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
 
-.positive { color: var(--green); }
-.negative { color: var(--red); }
+  #status {
+    color: #cbd5e1;
+    font-size: 14px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    min-height: 22px;
+  }
 
-.hero-bottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 22px;
-  border-top: 1px solid #ffffff18;
-  padding-top: 16px;
-}
+  label {
+    display: block;
+    margin-bottom: 8px;
+  }
 
-.hero-bottom strong { display: block; margin-top: 5px; }
+  input, select, button {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    font: inherit;
+  }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 18px;
-}
+  input, select {
+    color: white;
+    background: #0f172a;
+    border: 1px solid #475569;
+    margin-bottom: 12px;
+  }
 
-.stat {
-  border: 1px solid var(--line);
-  background: var(--card);
-  border-radius: 16px;
-  padding: 16px;
-}
+  button {
+    border: 0;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-weight: 650;
+    touch-action: manipulation;
+  }
 
-.stat .value {
-  font-size: 21px;
-  font-weight: 700;
-  margin-top: 8px;
-  overflow-wrap: anywhere;
-}
+  button.green { background: #15803d; }
+  button.gray { background: #475569; }
+  button.red { background: #9f1239; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
 
-.section-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 18px;
-}
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+  }
 
-.days {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(78px, 1fr));
-  gap: 9px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0;
+  }
 
-.day {
-  background: #0e1626;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  text-align: center;
-  padding: 12px 6px;
-}
+  .tabs button {
+    width: auto;
+    flex: 1;
+    padding: 12px 6px;
+    background: #334155;
+    font-size: 14px;
+  }
 
-.day.today {
-  border-color: var(--blue);
-  background: #233050;
-}
+  .tabs button.active { background: #2563eb; }
+  .tab-page[hidden] { display: none; }
 
-.day.future { opacity: .55; }
-.day-name { font-size: 12px; color: var(--muted); }
-.day-date { font-weight: 700; margin: 6px 0; }
-.day-spend { font-size: 12px; color: var(--red); }
-.day-add { font-size: 11px; color: var(--green); min-height: 16px; }
+  .entry {
+    border-bottom: 1px solid #334155;
+    padding: 12px 0;
+  }
 
-.bar-track {
-  height: 48px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin: 10px 0;
-}
+  .entry small, .edit-entry small {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 12px;
+  }
 
-.bar {
-  width: 16px;
-  border-radius: 5px;
-  background: linear-gradient(var(--blue), #4762c6);
-  min-height: 3px;
-}
+  .edit-entry { border: 1px solid #334155; }
+  .edit-entry input, .edit-entry select { background: #1e293b; }
 
-label {
-  color: var(--muted);
-  display: block;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
+  .graph-card h2 { margin-top: 0; }
+  .graph-card svg { display: block; width: 100%; height: auto; }
 
-input {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: #0e1626;
-  border-radius: 12px;
-  color: white;
-  padding: 14px;
-  margin-bottom: 15px;
-  outline: none;
-}
+  .graph-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
 
-input:focus { border-color: var(--blue); }
+  .graph-summary div {
+    padding: 14px;
+    background: #0f172a;
+    border-radius: 10px;
+  }
 
-.amount-input { font-size: 27px; font-weight: 650; }
+  .graph-summary span {
+    display: block;
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+  .graph-legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
 
-button {
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  color: white;
-  background: #344974;
-  font-weight: 650;
-}
+  .legend-spend { color: #fb7185; }
+  .legend-add { color: #4ade80; }
 
-.spend { background: #495dd6; }
-.add { background: #167657; }
-.secondary { background: #24314b; font-size: 13px; }
-.danger { color: #ffb5c3; }
-
-.tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tools button { flex: 1; min-width: 115px; }
-
-#status {
-  color: var(--muted);
-  font-size: 13px;
-  white-space: pre-wrap;
-  margin: 15px 0 0;
-  overflow-wrap: anywhere;
-}
-
-#notice {
-  display: none;
-  padding: 13px;
-  border-radius: 12px;
-  color: #ffc1ce;
-  background: #622b3d;
-  margin-bottom: 18px;
-}
-
-.entry {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid var(--line);
-  padding: 15px 0;
-}
-
-.entry:last-child { border-bottom: none; }
-.entry-title { font-size: 14px; font-weight: 650; }
-.entry-details { font-size: 12px; color: var(--muted); margin-top: 5px; }
-.entry-amount { text-align: right; font-weight: 700; white-space: nowrap; }
-
-.empty {
-  color: var(--muted);
-  text-align: center;
-  padding: 25px 0;
-}
-
-#overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  background: #0b1120f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 22px;
-}
-
-.loading-box { text-align: center; max-width: 380px; }
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #263451;
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  margin: 0 auto 22px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-#login {
-  display: none;
-  text-align: left;
-  margin-top: 22px;
-}
-
-#login button { width: 100%; }
-#loginError { color: var(--red); font-size: 13px; white-space: pre-wrap; }
-
-@media (max-width: 480px) {
-  .app { padding: 20px 13px 35px; }
-  .card { padding: 18px; border-radius: 18px; }
-  .stats { gap: 8px; }
-  .stat { padding: 12px 9px; }
-  .stat .value { font-size: 17px; }
-  h1 { font-size: 21px; }
-}
+  @media (max-width: 400px) {
+    main { padding: 16px; }
+    .graph-summary { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 
 <body>
-<div id="overlay" aria-live="polite">
-  <div class="loading-box">
-    <div class="spinner" id="spinner"></div>
-    <h2 id="loadingTitle">Opening your tracker</h2>
-    <p class="muted" id="loadingText">Loading your budget and weekly activity…</p>
+<main>
+  <h1>Money Tracker</h1>
 
-    <form id="login">
-      <label for="tokenInput">GitHub fine-grained token</label>
-      <input
-        id="tokenInput"
-        type="password"
-        autocomplete="off"
-        placeholder="github_pat_..."
-      >
-      <p class="small muted">
-        Saved in this browser on this device. Only use this on a device you trust.
-      </p>
-      <button type="submit">Connect tracker</button>
-      <p id="loginError"></p>
-    </form>
+  <div class="muted">
+    $60 added every Monday. Unused money and negative balances carry forward.
   </div>
-</div>
 
-<main class="app">
-  <header>
-    <div>
-      <h1>Money Tracker</h1>
-      <div class="muted small" id="todayLabel"></div>
-    </div>
-    <span class="badge">$60 / week</span>
-  </header>
-
+  <div id="balance" class="balance">—</div>
   <div id="notice" role="alert"></div>
+  <p id="status" role="status" aria-live="polite">Connecting…</p>
 
-  <section class="card hero">
-    <div class="muted">Available to spend</div>
-    <div class="balance" id="balance">—</div>
-    <div class="small muted">Unused money and negative balances carry forward.</div>
+  <div class="tabs" role="tablist" aria-label="Tracker sections">
+    <button
+      id="tabButton-budget"
+      class="active"
+      role="tab"
+      aria-selected="true"
+      aria-controls="page-budget"
+      onclick="switchTab('budget')"
+    >Budget</button>
 
-    <div class="hero-bottom">
-      <div>
-        <span class="muted small">Daily guide</span>
-        <strong id="dailyGuide">—</strong>
-      </div>
-      <div>
-        <span class="muted small">Next allowance</span>
-        <strong id="nextAllowance">—</strong>
-      </div>
-      <div>
-        <span class="muted small">Week starting</span>
-        <strong id="weekLabel">—</strong>
-      </div>
-    </div>
-  </section>
+    <button
+      id="tabButton-graphs"
+      role="tab"
+      aria-selected="false"
+      aria-controls="page-graphs"
+      onclick="switchTab('graphs')"
+    >Graphs</button>
 
-  <div class="stats">
-    <div class="stat">
-      <div class="muted small">Carryover</div>
-      <div class="value" id="carryover">—</div>
-    </div>
-    <div class="stat">
-      <div class="muted small">Spent this week</div>
-      <div class="value negative" id="spent">—</div>
-    </div>
-    <div class="stat">
-      <div class="muted small">Added this week</div>
-      <div class="value positive" id="added">—</div>
-    </div>
+    <button
+      id="tabButton-advanced"
+      role="tab"
+      aria-selected="false"
+      aria-controls="page-advanced"
+      onclick="switchTab('advanced')"
+    >Advanced</button>
   </div>
 
-  <section class="card">
-    <div class="section-title">
-      <h2>Day by day</h2>
-      <span class="small muted">This week</span>
+  <section
+    id="page-budget"
+    class="tab-page"
+    role="tabpanel"
+    aria-labelledby="tabButton-budget"
+  >
+    <div class="panel">
+      <div>Week starting: <span id="week">—</span></div>
+      <div>Opening carryover: <span id="carryover">—</span></div>
+      <div>Spent this week: <span id="spent">—</span></div>
+      <div>Added this week: <span id="added">—</span></div>
+      <div>Available now: <span id="available">—</span></div>
     </div>
-    <div class="days" id="days"></div>
-    <p class="small muted">
-      Bars show actual spending. The daily guide divides your available
-      balance across today through Sunday; it does not add money.
-    </p>
-  </section>
-
-  <section class="card">
-    <div class="section-title"><h2>Add an entry</h2></div>
 
     <label for="amount">Amount</label>
     <input
       id="amount"
-      class="amount-input"
       type="number"
-      inputmode="decimal"
       min="0.01"
       step="0.01"
+      inputmode="decimal"
       placeholder="0.00"
     >
 
     <label for="note">Note (optional)</label>
-    <input id="note" maxlength="200" placeholder="Lunch, shopping, repayment…">
+    <input id="note" type="text" maxlength="200" placeholder="Lunch, repayment…">
 
-    <div class="actions">
-      <button data-action class="spend" onclick="submitEntry('spend')">
-        − Spend
-      </button>
-      <button data-action class="add" onclick="submitEntry('add')">
-        + Add money
-      </button>
-    </div>
+    <button data-action onclick="submitEntry('spend')">Spend Money</button>
 
-    <p id="status" role="status">Connecting…</p>
-  </section>
+    <button data-action class="green" onclick="submitEntry('add')">
+      Add Money / Pay Debt
+    </button>
 
-  <section class="card">
-    <div class="section-title">
-      <h2>Recent activity</h2>
-      <span id="entryCount" class="small muted"></span>
-    </div>
+    <button data-action class="gray" onclick="refreshBudget()">
+      Refresh Budget / Retry Excel Export
+    </button>
+
+    <button data-action class="gray" onclick="backupNow()">
+      Backup Excel Now
+    </button>
+
+    <p class="muted">
+      A no-spend week needs no button. Your remaining money carries forward,
+      and the next Monday adds another $60.
+    </p>
+
+    <h2>Recent history</h2>
     <div id="history"></div>
   </section>
 
-  <div class="tools">
-    <button data-action class="secondary" onclick="refreshBudget()">Refresh</button>
-    <button data-action class="secondary" onclick="backupNow()">Backup Excel</button>
-    <button data-action class="secondary danger" onclick="forgetToken()">
-      Forget token
-    </button>
-  </div>
+  <section
+    id="page-graphs"
+    class="tab-page"
+    role="tabpanel"
+    aria-labelledby="tabButton-graphs"
+    hidden
+  >
+    <div id="graphSummary" class="graph-summary"></div>
 
-  <p class="small muted">
-    No-spend weeks work automatically: keep your remaining balance and
-    receive another $60 each Monday. Backups are created every 10 money
-    entries, or manually above.
-  </p>
+    <div class="graph-card">
+      <h2>Weekly money activity</h2>
+      <p class="muted">The most recent 12 weeks, including weeks with no spending.</p>
+
+      <div class="graph-legend">
+        <span class="legend-spend">■ Spending</span>
+        <span class="legend-add">■ Added money</span>
+      </div>
+
+      <div id="weeklyGraph"></div>
+    </div>
+
+    <div class="graph-card">
+      <h2>Balance history</h2>
+      <p class="muted">
+        Includes weekly allowances, spending, and added money.
+      </p>
+      <div id="balanceGraph"></div>
+    </div>
+  </section>
+
+  <section
+    id="page-advanced"
+    class="tab-page"
+    role="tabpanel"
+    aria-labelledby="tabButton-advanced"
+    hidden
+  >
+    <h2>Settings</h2>
+
+    <button data-action class="gray" onclick="backupNow()">
+      Backup Excel Now
+    </button>
+
+    <button id="forgetButton" class="red" onclick="forgetSavedToken()">
+      Forget Saved Token
+    </button>
+
+    <p class="muted">
+      The token is remembered in this browser on this device.
+      Only use this option on a device you trust.
+      Removing it here does not revoke it on GitHub.
+    </p>
+
+    <h2>Edit entries</h2>
+
+    <p class="muted">
+      Change a transaction's amount, type, or note.
+      Saving recalculates your balance and later history balances.
+      An Excel backup is created before each edit.
+      Dates and weekly allowances cannot be edited here.
+    </p>
+
+    <input
+      id="advancedSearch"
+      type="search"
+      placeholder="Search notes, dates, or entry types"
+      aria-label="Search entries"
+      oninput="renderAdvanced()"
+    >
+
+    <div id="advancedEntries"></div>
+  </section>
 </main>
 
 <script>
 "use strict";
 
+/* Repository settings — do not put your token here. */
 const CONFIG = {
   owner: "MrTopHatKid",
   repo: "Money-Tracker",
@@ -452,14 +367,25 @@ const CONFIG = {
   backupEvery: 10
 };
 
-const TOKEN_KEY = "money-tracker-github-token";
-const WEEKLY = 6000;
-const $ = id => document.getElementById(id);
+const WEEKLY_CENTS = 6000;
+
+const TOKEN_STORAGE_KEY =
+  `money-tracker-token:${CONFIG.owner}/${CONFIG.repo}`;
+
+/* Used by the previous version of this page. */
+const LEGACY_TOKEN_KEY = "money-tracker-github-token";
 
 let token = "";
 let state = null;
 let stateSha = null;
 let busy = true;
+let currentTab = "budget";
+
+const $ = id => document.getElementById(id);
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
 
 function money(cents) {
   return new Intl.NumberFormat("en-CA", {
@@ -468,7 +394,26 @@ function money(cents) {
   }).format(cents / 100);
 }
 
-function key(date) {
+function status(message) {
+  $("status").textContent = message;
+}
+
+function notice(message = "") {
+  $("notice").textContent = message;
+  $("notice").style.display = message ? "block" : "none";
+}
+
+function setBusy(value) {
+  busy = value;
+
+  document.querySelectorAll("[data-action]").forEach(button => {
+    button.disabled = value || !state;
+  });
+
+  $("forgetButton").disabled = value;
+}
+
+function dateKey(date) {
   return [
     date.getFullYear(),
     String(date.getMonth() + 1).padStart(2, "0"),
@@ -476,67 +421,60 @@ function key(date) {
   ].join("-");
 }
 
-function parseDay(value) {
-  const [y, m, d] = value.split("-").map(Number);
-  return new Date(y, m - 1, d, 12);
+function parseDate(key) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day, 12);
 }
 
-function monday(date = new Date()) {
+function mondayKey(date = new Date()) {
   const d = new Date(date);
   d.setHours(12, 0, 0, 0);
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-  return key(d);
+  return dateKey(d);
 }
 
-function shiftDay(value, days) {
-  const d = parseDay(value);
-  d.setDate(d.getDate() + days);
-  return key(d);
+function nextMonday(key) {
+  const d = parseDate(key);
+  d.setDate(d.getDate() + 7);
+  return dateKey(d);
 }
 
-function id() {
+function validDateKey(key) {
+  return typeof key === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(key) &&
+    dateKey(parseDate(key)) === key;
+}
+
+function entryId() {
   return crypto.randomUUID();
 }
 
-function balance(s = state) {
-  return s.carryoverCents + WEEKLY + s.addedCents - s.spentCents;
+function available(s = state) {
+  return s.carryoverCents + WEEKLY_CENTS +
+    s.addedCents - s.spentCents;
 }
 
-function setStatus(text) {
-  $("status").textContent = text;
-}
-
-function setBusy(value) {
-  busy = value;
-  document.querySelectorAll("[data-action]").forEach(button => {
-    button.disabled = value || !state;
-  });
-}
-
-function showNotice(text) {
-  $("notice").textContent = text;
-  $("notice").style.display = text ? "block" : "none";
-}
-
-function freshState() {
+function newState() {
   return {
     version: 2,
-    weekStart: monday(),
+    weekStart: mondayKey(),
     carryoverCents: 0,
     spentCents: 0,
     addedCents: 0,
     transactions: 0,
     lastBackupTransaction: 0,
     entries: [],
+    editHistory: [],
     processedShortcutIds: [],
     lastUpdated: null
   };
 }
 
-function validate(s) {
+function validateState(s) {
   if (
+    !s ||
     s.version !== 2 ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(s.weekStart || "") ||
+    !validDateKey(s.weekStart) ||
     !Array.isArray(s.entries) ||
     !Array.isArray(s.processedShortcutIds) ||
     ![
@@ -549,30 +487,69 @@ function validate(s) {
   ) {
     throw new Error(
       "This budget uses an older or unsupported format. " +
-      "Your files have not been overwritten. Back them up before migration."
+      "Existing data has not been overwritten. " +
+      "Back it up before migrating to this version."
     );
+  }
+
+  const ids = new Set();
+
+  for (const e of s.entries) {
+    if (
+      !e ||
+      typeof e.id !== "string" ||
+      ids.has(e.id) ||
+      !validDateKey(e.weekStart) ||
+      !["Spend", "Add Money", "Week Start"].includes(e.type) ||
+      !Number.isSafeInteger(e.amountCents) ||
+      e.amountCents <= 0 ||
+      !Number.isSafeInteger(e.balanceCents) ||
+      typeof e.date !== "string" ||
+      !Number.isFinite(Date.parse(e.date))
+    ) {
+      throw new Error(
+        "A history entry is invalid. No data was overwritten."
+      );
+    }
+
+    ids.add(e.id);
+  }
+
+  if (s.editHistory !== undefined && !Array.isArray(s.editHistory)) {
+    throw new Error("The edit history format is invalid.");
   }
 }
 
-function advanceWeeks(s) {
+function addWeeks(s) {
+  const current = mondayKey();
   let changed = false;
-  const current = monday();
+
+  if (s.weekStart > current) {
+    throw new Error(
+      "The saved budget week is ahead of this device's date. " +
+      "Check your device date and timezone."
+    );
+  }
 
   while (s.weekStart < current) {
-    const remaining = balance(s);
-    s.weekStart = shiftDay(s.weekStart, 7);
+    const remaining = available(s);
+
+    s.weekStart = nextMonday(s.weekStart);
     s.carryoverCents = remaining;
     s.spentCents = 0;
     s.addedCents = 0;
 
+    if (!Number.isSafeInteger(available(s))) {
+      throw new Error("The balance is outside the supported range.");
+    }
+
     s.entries.push({
-      id: id(),
+      id: entryId(),
       date: new Date().toISOString(),
       weekStart: s.weekStart,
-      localDate: s.weekStart,
       type: "Week Start",
-      amountCents: WEEKLY,
-      balanceCents: balance(s),
+      amountCents: WEEKLY_CENTS,
+      balanceCents: available(s),
       note: "Weekly allowance added; previous balance carried forward."
     });
 
@@ -585,22 +562,26 @@ function advanceWeeks(s) {
 function encodeText(text) {
   const bytes = new TextEncoder().encode(text);
   let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
   return btoa(binary);
 }
 
-function decodeText(content) {
-  const binary = atob(content.replace(/\s/g, ""));
-  return new TextDecoder().decode(
-    Uint8Array.from(binary, char => char.charCodeAt(0))
-  );
+function decodeText(base64) {
+  const binary = atob(base64.replace(/\s/g, ""));
+  const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
-function endpoint(path, read) {
-  const encoded = path.split("/").map(encodeURIComponent).join("/");
+function apiUrl(path, read = false) {
+  const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+
   let url =
     `https://api.github.com/repos/${encodeURIComponent(CONFIG.owner)}` +
-    `/${encodeURIComponent(CONFIG.repo)}/contents/${encoded}`;
+    `/${encodeURIComponent(CONFIG.repo)}/contents/${encodedPath}`;
 
   if (read) {
     url += `?ref=${encodeURIComponent(CONFIG.branch)}&t=${Date.now()}`;
@@ -610,7 +591,7 @@ function endpoint(path, read) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(endpoint(path, !options.method), {
+  const response = await fetch(apiUrl(path, !options.method), {
     ...options,
     cache: "no-store",
     headers: {
@@ -621,29 +602,46 @@ async function api(path, options = {}) {
     }
   });
 
-  if (response.status === 404 && !options.method) return null;
+  if (response.status === 404 && !options.method) {
+    return null;
+  }
 
   if (!response.ok) {
-    let detail = "";
-    try { detail = (await response.json()).message || ""; } catch {}
+    let message = "";
+
+    try {
+      message = (await response.json()).message || "";
+    } catch {}
 
     if (response.status === 401) {
-      throw new Error("Token is invalid or expired. Forget it and enter a new one.");
+      throw new Error(
+        "GitHub rejected the token. It may be invalid or expired. " +
+        "Use Advanced → Forget Saved Token, then reload."
+      );
+    }
+
+    if (response.status === 403) {
+      throw new Error(
+        "GitHub denied access. Check the token's repository selection, " +
+        "Contents permission, expiration, and any API limits. " + message
+      );
     }
 
     if (response.status === 409 || response.status === 422) {
       throw new Error(
-        "Update conflict. Refresh and check your history before retrying. " + detail
+        `GitHub rejected the update (${response.status}). ` +
+        "Refresh before trying again; another update may have happened. " +
+        message
       );
     }
 
-    throw new Error(`GitHub ${response.status}: ${detail}`);
+    throw new Error(`GitHub error ${response.status}: ${message}`);
   }
 
   return response.json();
 }
 
-async function loadState() {
+async function readState() {
   const file = await api(CONFIG.jsonPath);
 
   if (!file) {
@@ -651,25 +649,31 @@ async function loadState() {
 
     if (excel) {
       throw new Error(
-        "An Excel-only budget already exists. Back up and migrate those files " +
-        "before starting this version. Nothing was overwritten."
+        "budget.xlsx exists but budget.json does not. " +
+        "Your Excel-only budget needs migration first. " +
+        "This version will not overwrite it."
       );
     }
 
-    return { data: freshState(), sha: null };
+    return { state: newState(), sha: null };
+  }
+
+  if (typeof file.content !== "string") {
+    throw new Error("GitHub did not return readable budget file content.");
   }
 
   const loaded = JSON.parse(decodeText(file.content));
-  validate(loaded);
-  return { data: loaded, sha: file.sha };
+  validateState(loaded);
+
+  return { state: loaded, sha: file.sha };
 }
 
-async function saveState(candidate, sha, message) {
+async function commitState(candidate, sha, message) {
   candidate.lastUpdated = new Date().toISOString();
 
-  const output = {
+  const document = {
     ...candidate,
-    available: balance(candidate) / 100,
+    available: available(candidate) / 100,
     carryover: candidate.carryoverCents / 100,
     spentThisWeek: candidate.spentCents / 100,
     addedThisWeek: candidate.addedCents / 100,
@@ -679,7 +683,7 @@ async function saveState(candidate, sha, message) {
   const body = {
     message,
     branch: CONFIG.branch,
-    content: encodeText(JSON.stringify(output, null, 2))
+    content: encodeText(JSON.stringify(document, null, 2))
   };
 
   if (sha) body.sha = sha;
@@ -692,12 +696,14 @@ async function saveState(candidate, sha, message) {
   return result.content.sha;
 }
 
-function workbook(s) {
+function workbookContent(s) {
   if (!window.XLSX) {
-    throw new Error("Excel library did not load. Check your connection.");
+    throw new Error(
+      "The Excel library did not load. Check your connection and reload."
+    );
   }
 
-  const book = XLSX.utils.book_new();
+  const workbook = XLSX.utils.book_new();
 
   const summary = [
     ["Field", "Value"],
@@ -706,40 +712,74 @@ function workbook(s) {
     ["Opening carryover", s.carryoverCents / 100],
     ["Spent this week", s.spentCents / 100],
     ["Added this week", s.addedCents / 100],
-    ["Available", balance(s) / 100],
+    ["Available", available(s) / 100],
     ["Last updated", s.lastUpdated || ""]
   ];
 
   const history = [
-    ["ID", "Date", "Local day", "Week", "Type", "Amount", "Balance", "Note"],
+    ["ID", "Date", "Week", "Type", "Amount", "Available After", "Note", "Edited At"],
     ...s.entries.map(e => [
-      e.id, e.date, e.localDate || key(new Date(e.date)),
-      e.weekStart, e.type, e.amountCents / 100,
-      e.balanceCents / 100, e.note || ""
+      e.id,
+      e.date,
+      e.weekStart,
+      e.type,
+      e.amountCents / 100,
+      e.balanceCents / 100,
+      e.note || "",
+      e.editedAt || ""
     ])
   ];
 
-  const daily = [["Date", "Spent", "Added"]];
+  const edits = [
+    [
+      "Entry ID",
+      "Edited At",
+      "Previous Type",
+      "Previous Amount",
+      "Previous Note",
+      "New Type",
+      "New Amount",
+      "New Note"
+    ],
+    ...(s.editHistory || []).map(edit => [
+      edit.entryId,
+      edit.date,
+      edit.before.type,
+      edit.before.amountCents / 100,
+      edit.before.note,
+      edit.after.type,
+      edit.after.amountCents / 100,
+      edit.after.note
+    ])
+  ];
 
-  for (const day of dailyTotals(s)) {
-    daily.push([day.date, day.spent / 100, day.added / 100]);
-  }
+  XLSX.utils.book_append_sheet(
+    workbook, XLSX.utils.aoa_to_sheet(summary), "Summary"
+  );
 
-  for (const [name, rows] of [
-    ["Summary", summary],
-    ["History", history],
-    ["This Week", daily]
-  ]) {
-    XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(rows), name);
-  }
+  XLSX.utils.book_append_sheet(
+    workbook, XLSX.utils.aoa_to_sheet(history), "History"
+  );
 
-  return XLSX.write(book, { bookType: "xlsx", type: "base64" });
+  XLSX.utils.book_append_sheet(
+    workbook, XLSX.utils.aoa_to_sheet(edits), "Edit Audit"
+  );
+
+  return XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "base64"
+  });
 }
 
-async function writeExcel(path, message) {
-  const content = workbook(state);
+async function writeExcel(path, message, s) {
+  const content = workbookContent(s);
   const existing = await api(path);
-  const body = { message, branch: CONFIG.branch, content };
+
+  const body = {
+    message,
+    branch: CONFIG.branch,
+    content
+  };
 
   if (existing) body.sha = existing.sha;
 
@@ -749,211 +789,144 @@ async function writeExcel(path, message) {
   });
 }
 
-async function exportFiles(forceBackup = false) {
+async function exportAndBackup(forceBackup = false) {
   try {
-    setStatus("Budget saved. Updating Excel…");
-    await writeExcel(CONFIG.excelPath, "Update budget Excel export");
+    status("Budget saved. Updating Excel…");
 
-    const due = state.transactions - state.lastBackupTransaction
-      >= CONFIG.backupEvery;
+    await writeExcel(
+      CONFIG.excelPath,
+      "Update budget Excel export",
+      state
+    );
+
+    const due =
+      state.transactions - state.lastBackupTransaction >= CONFIG.backupEvery;
 
     if (forceBackup || due) {
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const path =
+        `${CONFIG.backupFolder}/budget-${stamp}-${entryId()}.xlsx`;
 
-      await writeExcel(
-        `${CONFIG.backupFolder}/budget-${stamp}-${id()}.xlsx`,
-        "Create budget backup"
-      );
+      await writeExcel(path, "Create budget backup", state);
 
-      const candidate = structuredClone(state);
+      const candidate = clone(state);
       candidate.lastBackupTransaction = candidate.transactions;
 
-      const sha = await saveState(
-        candidate, stateSha, "Record successful Excel backup"
+      const sha = await commitState(
+        candidate,
+        stateSha,
+        "Record successful budget backup"
       );
 
       state = candidate;
       stateSha = sha;
-      setStatus("Budget, Excel, and backup saved.");
+
+      status("Budget, Excel export, and backup saved.");
     } else {
-      setStatus("Saved to GitHub · " + new Date().toLocaleTimeString());
+      status("Budget and Excel export saved.");
     }
   } catch (error) {
-    setStatus(
-      "Your budget is saved in budget.json, but Excel or backup needs retrying.\n" +
-      error.message
+    status(
+      "The budget is saved in budget.json, but the Excel export or " +
+      "backup needs retrying.\n" + error.message
     );
-  }
-}
-
-function dailyTotals(s = state) {
-  const days = Array.from({ length: 7 }, (_, i) => ({
-    date: shiftDay(s.weekStart, i),
-    spent: 0,
-    added: 0
-  }));
-
-  const map = new Map(days.map(day => [day.date, day]));
-
-  for (const e of s.entries) {
-    if (e.type !== "Spend" && e.type !== "Add Money") continue;
-
-    const date = e.localDate || key(new Date(e.date));
-    const day = map.get(date);
-    if (!day) continue;
-
-    if (e.type === "Spend") day.spent += e.amountCents;
-    else day.added += e.amountCents;
-  }
-
-  return days;
-}
-
-function renderDays() {
-  const days = dailyTotals();
-  const max = Math.max(1, ...days.map(day => day.spent));
-  const today = key(new Date());
-
-  $("days").replaceChildren();
-
-  for (const day of days) {
-    const date = parseDay(day.date);
-    const card = document.createElement("div");
-    card.className = "day" +
-      (day.date === today ? " today" : "") +
-      (day.date > today ? " future" : "");
-
-    const name = document.createElement("div");
-    name.className = "day-name";
-    name.textContent = date.toLocaleDateString("en-CA", { weekday: "short" });
-
-    const number = document.createElement("div");
-    number.className = "day-date";
-    number.textContent = date.getDate();
-
-    const track = document.createElement("div");
-    track.className = "bar-track";
-
-    const bar = document.createElement("div");
-    bar.className = "bar";
-    bar.style.height = `${Math.max(3, day.spent / max * 48)}px`;
-    track.append(bar);
-
-    const spent = document.createElement("div");
-    spent.className = "day-spend";
-    spent.textContent = day.date > today ? "—" : money(day.spent);
-
-    const added = document.createElement("div");
-    added.className = "day-add";
-    added.textContent = day.added ? "+" + money(day.added) : "";
-
-    card.append(name, number, track, spent, added);
-    $("days").append(card);
   }
 }
 
 function render() {
   if (!state) return;
 
-  const remaining = balance();
-  const dayIndex = (new Date().getDay() + 6) % 7;
-  const daysLeft = 7 - dayIndex;
+  const balance = available();
 
-  $("balance").textContent = money(remaining);
-  $("balance").className = "balance " + (remaining < 0 ? "negative" : "positive");
+  $("balance").textContent = money(balance);
+  $("balance").className =
+    "balance " + (
+      balance < 0 ? "negative" :
+      balance === 0 ? "zero" : "positive"
+    );
 
-  $("dailyGuide").textContent =
-    money(Math.floor(Math.max(0, remaining) / daysLeft)) + " / day";
-
-  $("nextAllowance").textContent =
-    parseDay(shiftDay(state.weekStart, 7)).toLocaleDateString("en-CA", {
-      weekday: "short", month: "short", day: "numeric"
-    });
-
-  $("weekLabel").textContent =
-    parseDay(state.weekStart).toLocaleDateString("en-CA", {
-      month: "short", day: "numeric"
-    });
+  $("week").textContent =
+    parseDate(state.weekStart).toLocaleDateString();
 
   $("carryover").textContent = money(state.carryoverCents);
   $("spent").textContent = money(state.spentCents);
   $("added").textContent = money(state.addedCents);
-  $("entryCount").textContent = state.transactions + " money entries";
+  $("available").textContent = money(balance);
 
-  showNotice(remaining <= 0
-    ? "Budget limit reached. More spending increases your negative balance."
+  notice(balance <= 0
+    ? "Budget limit reached. Further spending increases your negative balance."
     : ""
   );
 
-  renderDays();
   $("history").replaceChildren();
 
-  const recent = state.entries.slice(-25).reverse();
+  for (const e of state.entries.slice(-30).reverse()) {
+    const div = document.createElement("div");
+    div.className = "entry";
 
-  if (!recent.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = "No entries yet. Your week starts with $60.";
-    $("history").append(empty);
-  }
-
-  for (const e of recent) {
-    const row = document.createElement("div");
-    row.className = "entry";
-
-    const left = document.createElement("div");
     const title = document.createElement("div");
-    title.className = "entry-title";
-    title.textContent = e.note || e.type;
+    title.textContent =
+      `${e.type}: ${money(e.amountCents)} — Balance: ${money(e.balanceCents)}`;
 
-    const details = document.createElement("div");
-    details.className = "entry-details";
+    const details = document.createElement("small");
     details.textContent =
-      (e.type === "Week Start"
-        ? e.weekStart
-        : new Date(e.date).toLocaleString()) +
-      " · " + e.type;
+      `${new Date(e.date).toLocaleString()}` +
+      `${e.note ? " • " + e.note : ""}` +
+      `${e.editedAt ? " • Edited" : ""}`;
 
-    left.append(title, details);
-
-    const right = document.createElement("div");
-    right.className = "entry-amount " +
-      (e.type === "Spend" ? "negative" : "positive");
-
-    right.textContent =
-      (e.type === "Spend" ? "−" : "+") + money(e.amountCents);
-
-    const after = document.createElement("div");
-    after.className = "entry-details";
-    after.textContent = "Balance " + money(e.balanceCents);
-    right.append(after);
-
-    row.append(left, right);
-    $("history").append(row);
+    div.append(title, details);
+    $("history").append(div);
   }
+
+  if (currentTab === "graphs") renderGraphs();
+  if (currentTab === "advanced") renderAdvanced();
 }
 
-async function syncState() {
-  const loaded = await loadState();
-  const candidate = loaded.data;
-  const changed = advanceWeeks(candidate);
+async function refreshInternal() {
+  const loaded = await readState();
+  const candidate = loaded.state;
+  const changed = addWeeks(candidate);
+
   let sha = loaded.sha;
 
   if (changed || !sha) {
-    sha = await saveState(candidate, sha, "Initialize or advance weekly budget");
+    sha = await commitState(
+      candidate,
+      sha,
+      "Initialize or advance weekly budget"
+    );
   }
 
   state = candidate;
   stateSha = sha;
   render();
+
   return changed || !loaded.sha;
+}
+
+async function refreshBudget() {
+  if (busy) return;
+
+  setBusy(true);
+
+  try {
+    status("Refreshing budget…");
+    await refreshInternal();
+    await exportAndBackup();
+  } catch (error) {
+    status(error.message);
+  } finally {
+    setBusy(false);
+  }
 }
 
 function parseAmount(value) {
   const text = String(value).trim();
 
   if (!/^\d+(?:\.\d{1,2})?$/.test(text)) {
-    throw new Error("Enter a positive amount with up to two decimal places.");
+    throw new Error(
+      "Enter a positive amount with no more than two decimal places."
+    );
   }
 
   const cents = Math.round(Number(text) * 100);
@@ -965,46 +938,71 @@ function parseAmount(value) {
   return cents;
 }
 
-async function record(type, amount, note, shortcutId = "") {
-  const loaded = await loadState();
-  const candidate = loaded.data;
-  const rolled = advanceWeeks(candidate);
+async function recordTransaction(type, amount, note, shortcutId = "") {
+  const loaded = await readState();
+  const candidate = loaded.state;
+  const advancedWeek = addWeeks(candidate);
 
-  if (shortcutId && candidate.processedShortcutIds.includes(shortcutId)) {
+  if (
+    shortcutId &&
+    candidate.processedShortcutIds.includes(shortcutId)
+  ) {
     let sha = loaded.sha;
 
-    if (rolled) {
-      sha = await saveState(candidate, sha, "Advance weekly budget");
+    if (advancedWeek) {
+      sha = await commitState(
+        candidate,
+        loaded.sha,
+        "Advance weekly budget"
+      );
     }
 
     state = candidate;
     stateSha = sha;
     render();
-    setStatus("This Shortcut entry was already saved. No duplicate was added.");
-    if (rolled) await exportFiles();
+
+    if (advancedWeek) {
+      await exportAndBackup();
+    } else {
+      status("This Shortcut entry was already saved. It was not added twice.");
+    }
+
     return;
   }
 
-  if (type === "spend") candidate.spentCents += amount;
-  else candidate.addedCents += amount;
+  if (type === "spend") {
+    candidate.spentCents += amount;
+  } else {
+    candidate.addedCents += amount;
+  }
+
+  if (
+    !Number.isSafeInteger(candidate.spentCents) ||
+    !Number.isSafeInteger(candidate.addedCents) ||
+    !Number.isSafeInteger(available(candidate))
+  ) {
+    throw new Error("The amount is outside the supported range.");
+  }
 
   candidate.transactions++;
+
   candidate.entries.push({
-    id: shortcutId || id(),
+    id: shortcutId || entryId(),
     date: new Date().toISOString(),
-    localDate: key(new Date()),
     weekStart: candidate.weekStart,
     type: type === "spend" ? "Spend" : "Add Money",
     amountCents: amount,
-    balanceCents: balance(candidate),
+    balanceCents: available(candidate),
     note
   });
 
-  if (shortcutId) candidate.processedShortcutIds.push(shortcutId);
+  if (shortcutId) {
+    candidate.processedShortcutIds.push(shortcutId);
+  }
 
-  setStatus("Saving entry…");
+  status("Saving transaction…");
 
-  const sha = await saveState(
+  const sha = await commitState(
     candidate,
     loaded.sha,
     `${type === "spend" ? "Spend" : "Add"} ${money(amount)}`
@@ -1012,49 +1010,39 @@ async function record(type, amount, note, shortcutId = "") {
 
   state = candidate;
   stateSha = sha;
+  render();
 
   $("amount").value = "";
   $("note").value = "";
-  render();
 
-  await exportFiles();
+  await exportAndBackup();
 }
 
 async function submitEntry(type) {
   if (busy || !state) return;
 
   let amount;
+
   try {
     amount = parseAmount($("amount").value);
   } catch (error) {
-    setStatus(error.message);
+    status(error.message);
     return;
   }
 
   setBusy(true);
 
   try {
-    await record(type, amount, $("note").value.trim());
-  } catch (error) {
-    setStatus(
-      "Could not confirm the entry was saved. Refresh and check history " +
-      "before retrying.\n" + error.message
+    await recordTransaction(
+      type,
+      amount,
+      $("note").value.trim()
     );
-  } finally {
-    setBusy(false);
-  }
-}
-
-async function refreshBudget() {
-  if (busy) return;
-  setBusy(true);
-
-  try {
-    setStatus("Refreshing…");
-    await syncState();
-    await exportFiles();
   } catch (error) {
-    setStatus(error.message);
+    status(
+      "Could not confirm the transaction was saved. Refresh and check " +
+      "the history before retrying.\n" + error.message
+    );
   } finally {
     setBusy(false);
   }
@@ -1062,151 +1050,799 @@ async function refreshBudget() {
 
 async function backupNow() {
   if (busy || !state) return;
+
   setBusy(true);
 
   try {
-    await syncState();
-    await exportFiles(true);
+    await refreshInternal();
+    await exportAndBackup(true);
   } catch (error) {
-    setStatus(error.message);
+    status(error.message);
   } finally {
     setBusy(false);
   }
 }
 
-function showLogin(message = "") {
-  $("overlay").style.display = "flex";
-  $("spinner").style.display = "none";
-  $("loadingTitle").textContent = "Connect your tracker";
-  $("loadingText").textContent =
-    "Enter your GitHub token once to remember this device.";
-  $("login").style.display = "block";
-  $("loginError").textContent = message;
-}
+/* ---------------- Tabs ---------------- */
 
-function forgetToken() {
-  if (busy) return;
-  if (!confirm("Remove the saved token from this browser?")) return;
+function switchTab(name) {
+  currentTab = name;
 
-  try {
-    localStorage.removeItem(TOKEN_KEY);
-    token = "";
-    state = null;
-    stateSha = null;
-    setBusy(true);
-    $("tokenInput").value = "";
-    showLogin();
-  } catch (error) {
-    setStatus("Could not remove token: " + error.message);
+  for (const tab of ["budget", "graphs", "advanced"]) {
+    const selected = tab === name;
+
+    $("page-" + tab).hidden = !selected;
+
+    const button = $("tabButton-" + tab);
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-selected", String(selected));
   }
+
+  if (name === "graphs") renderGraphs();
+  if (name === "advanced") renderAdvanced();
 }
 
-async function handleShortcut() {
-  const params = new URLSearchParams(location.search);
-  const spend = params.has("spend");
-  const add = params.has("add");
+/* ---------------- Editing ---------------- */
 
-  if (!spend && !add) return;
-  if (spend && add) throw new Error("Use either spend or add, not both.");
+function rebuildEditedLedger(s) {
+  let balance = WEEKLY_CENTS;
+  let currentSpent = 0;
+  let currentAdded = 0;
 
-  const type = spend ? "spend" : "add";
-  const amount = parseAmount(params.get(type));
-  const shortcutId = params.get("id") || id();
+  for (const entry of s.entries) {
+    if (entry.type === "Week Start") {
+      balance += WEEKLY_CENTS;
+      entry.amountCents = WEEKLY_CENTS;
+    } else if (entry.type === "Spend") {
+      balance -= entry.amountCents;
 
-  params.set("id", shortcutId);
+      if (entry.weekStart === s.weekStart) {
+        currentSpent += entry.amountCents;
+      }
+    } else if (entry.type === "Add Money") {
+      balance += entry.amountCents;
 
-  history.replaceState(
-    null, "", location.pathname + "?" + params.toString() + location.hash
-  );
-
-  await record(
-    type,
-    amount,
-    (params.get("note") || "Apple Shortcut").slice(0, 200),
-    shortcutId
-  );
-
-  history.replaceState(null, "", location.pathname + location.hash);
-}
-
-async function connect() {
-  setBusy(true);
-  $("spinner").style.display = "block";
-  $("login").style.display = "none";
-  $("loadingTitle").textContent = "Loading your budget";
-  $("loadingText").textContent = "Checking GitHub and building your weekly view…";
-
-  try {
-    const updated = await syncState();
-
-    let storageWarning = "";
-    try {
-      localStorage.setItem(TOKEN_KEY, token);
-    } catch {
-      storageWarning =
-        "\nThis browser could not remember your token. It is usable for this visit.";
-    }
-
-    $("overlay").style.display = "none";
-
-    const params = new URLSearchParams(location.search);
-
-    if (params.has("spend") || params.has("add")) {
-      await handleShortcut();
-    } else if (updated) {
-      await exportFiles();
+      if (entry.weekStart === s.weekStart) {
+        currentAdded += entry.amountCents;
+      }
     } else {
-      setStatus("Connected · Budget up to date");
+      throw new Error("Unsupported entry type: " + entry.type);
     }
 
-    if (storageWarning) {
-      setStatus($("status").textContent + storageWarning);
+    if (!Number.isSafeInteger(balance)) {
+      throw new Error("The edited balance is outside the supported range.");
     }
-  } catch (error) {
-    if (state) {
-      $("overlay").style.display = "none";
-      setStatus(
-        "Check history before retrying a transaction.\n" + error.message
-      );
-    } else {
-      showLogin(error.message);
-    }
-  } finally {
-    setBusy(false);
+
+    entry.balanceCents = balance;
   }
+
+  s.spentCents = currentSpent;
+  s.addedCents = currentAdded;
+
+  s.carryoverCents =
+    balance - WEEKLY_CENTS - currentAdded + currentSpent;
 }
 
-$("login").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (busy) return;
+function renderAdvanced() {
+  const container = $("advancedEntries");
+  container.replaceChildren();
 
-  token = $("tokenInput").value.trim();
-  if (!token) {
-    $("loginError").textContent = "Enter your token first.";
+  if (!state) {
+    container.textContent = "Load your budget first.";
     return;
   }
 
-  $("tokenInput").value = "";
-  await connect();
-});
+  const query = $("advancedSearch").value.trim().toLowerCase();
 
-async function start() {
-  $("todayLabel").textContent = new Date().toLocaleDateString("en-CA", {
-    weekday: "long", month: "long", day: "numeric"
-  });
+  const entries = state.entries
+    .filter(entry =>
+      entry.type === "Spend" || entry.type === "Add Money"
+    )
+    .filter(entry => {
+      const text =
+        `${entry.date} ${entry.weekStart} ${entry.type} ${entry.note || ""}`;
+
+      return text.toLowerCase().includes(query);
+    })
+    .slice()
+    .reverse();
+
+  if (!entries.length) {
+    container.textContent = "No matching transactions.";
+    return;
+  }
+
+  for (const entry of entries) {
+    const card = document.createElement("div");
+    card.className = "edit-entry";
+
+    const heading = document.createElement("h3");
+    heading.textContent =
+      `${entry.type} — ${money(entry.amountCents)}`;
+
+    const date = document.createElement("small");
+    date.textContent =
+      new Date(entry.date).toLocaleString() +
+      " • Week " + entry.weekStart;
+
+    const typeLabel = document.createElement("label");
+    typeLabel.textContent = "Entry type";
+
+    const typeInput = document.createElement("select");
+
+    for (const type of ["Spend", "Add Money"]) {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      option.selected = entry.type === type;
+      typeInput.append(option);
+    }
+
+    typeLabel.append(typeInput);
+
+    const amountLabel = document.createElement("label");
+    amountLabel.textContent = "Amount";
+
+    const amountInput = document.createElement("input");
+    amountInput.type = "number";
+    amountInput.min = "0.01";
+    amountInput.step = "0.01";
+    amountInput.inputMode = "decimal";
+    amountInput.value = (entry.amountCents / 100).toFixed(2);
+    amountLabel.append(amountInput);
+
+    const noteLabel = document.createElement("label");
+    noteLabel.textContent = "Note";
+
+    const noteInput = document.createElement("input");
+    noteInput.type = "text";
+    noteInput.maxLength = 200;
+    noteInput.value = entry.note || "";
+    noteLabel.append(noteInput);
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Save Changes";
+    saveButton.className = "green";
+    saveButton.dataset.action = "";
+    saveButton.disabled = busy;
+
+    const original = {
+      type: entry.type,
+      amountCents: entry.amountCents,
+      note: entry.note || "",
+      editedAt: entry.editedAt || ""
+    };
+
+    saveButton.onclick = () => saveEditedEntry(
+      entry.id,
+      original,
+      typeInput.value,
+      amountInput.value,
+      noteInput.value
+    );
+
+    card.append(
+      heading,
+      date,
+      typeLabel,
+      amountLabel,
+      noteLabel,
+      saveButton
+    );
+
+    container.append(card);
+  }
+}
+
+async function saveEditedEntry(
+  id,
+  original,
+  newType,
+  newAmount,
+  newNote
+) {
+  if (busy || !state) return;
+
+  let amount;
+  const cleanedNote = newNote.trim().slice(0, 200);
+
+  try {
+    amount = parseAmount(newAmount);
+
+    if (!["Spend", "Add Money"].includes(newType)) {
+      throw new Error("Choose a valid transaction type.");
+    }
+  } catch (error) {
+    status(error.message);
+    return;
+  }
+
+  if (
+    newType === original.type &&
+    amount === original.amountCents &&
+    cleanedNote === original.note
+  ) {
+    status("No changes to save.");
+    return;
+  }
+
+  if (!confirm(
+    "Save this edit? Your balance and later history balances will be recalculated."
+  )) {
+    return;
+  }
 
   setBusy(true);
 
   try {
-    token = localStorage.getItem(TOKEN_KEY) || "";
-  } catch {
-    token = "";
+    status("Checking the latest budget…");
+
+    const loaded = await readState();
+    const candidate = loaded.state;
+    const entry = candidate.entries.find(item => item.id === id);
+
+    if (!entry) {
+      throw new Error("This entry no longer exists. Refresh your budget.");
+    }
+
+    if (
+      entry.type !== original.type ||
+      entry.amountCents !== original.amountCents ||
+      (entry.note || "") !== original.note ||
+      (entry.editedAt || "") !== original.editedAt
+    ) {
+      throw new Error(
+        "This entry changed elsewhere. Refresh before editing it again."
+      );
+    }
+
+    status("Creating a backup before editing…");
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const path =
+      `${CONFIG.backupFolder}/before-edit-${stamp}-${entryId()}.xlsx`;
+
+    await writeExcel(
+      path,
+      "Back up budget before editing an entry",
+      candidate
+    );
+
+    const before = {
+      type: entry.type,
+      amountCents: entry.amountCents,
+      note: entry.note || ""
+    };
+
+    entry.type = newType;
+    entry.amountCents = amount;
+    entry.note = cleanedNote;
+    entry.editedAt = new Date().toISOString();
+
+    candidate.editHistory = candidate.editHistory || [];
+
+    candidate.editHistory.push({
+      entryId: id,
+      date: entry.editedAt,
+      before,
+      after: {
+        type: entry.type,
+        amountCents: entry.amountCents,
+        note: entry.note
+      }
+    });
+
+    addWeeks(candidate);
+    rebuildEditedLedger(candidate);
+
+    status("Saving the corrected budget…");
+
+    const sha = await commitState(
+      candidate,
+      loaded.sha,
+      "Edit budget transaction " + id
+    );
+
+    state = candidate;
+    stateSha = sha;
+
+    render();
+    await exportAndBackup();
+  } catch (error) {
+    status(
+      "Could not finish the edit. Refresh and check the entry before " +
+      "retrying.\n" + error.message
+    );
+  } finally {
+    setBusy(false);
+    renderAdvanced();
+
+    if (state) renderGraphs();
+  }
+}
+
+/* ---------------- Graphs ---------------- */
+
+function createSvg(width, height, label) {
+  const svg = document.createElementNS(
+    "http://www.w3.org/2000/svg", "svg"
+  );
+
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", label);
+
+  return svg;
+}
+
+function svgElement(svg, name, attributes, text) {
+  const element = document.createElementNS(
+    "http://www.w3.org/2000/svg", name
+  );
+
+  for (const [key, value] of Object.entries(attributes)) {
+    element.setAttribute(key, String(value));
   }
 
-  if (token) {
-    await connect();
-  } else {
-    showLogin();
+  if (text !== undefined) element.textContent = text;
+
+  svg.append(element);
+  return element;
+}
+
+function graphText(svg, x, y, text, anchor = "start") {
+  return svgElement(svg, "text", {
+    x,
+    y,
+    fill: "#94a3b8",
+    "font-size": 12,
+    "text-anchor": anchor,
+    "font-family": "system-ui, sans-serif"
+  }, text);
+}
+
+function renderGraphs() {
+  if (!state) return;
+
+  let spending = 0;
+  let additions = 0;
+
+  for (const entry of state.entries) {
+    if (entry.type === "Spend") spending += entry.amountCents;
+    if (entry.type === "Add Money") additions += entry.amountCents;
+  }
+
+  const summary = $("graphSummary");
+  summary.replaceChildren();
+
+  for (const [label, value] of [
+    ["Total spending", money(spending)],
+    ["Total added money", money(additions)]
+  ]) {
+    const card = document.createElement("div");
+    card.textContent = label;
+
+    const amount = document.createElement("span");
+    amount.textContent = value;
+
+    card.append(amount);
+    summary.append(card);
+  }
+
+  drawWeeklyGraph();
+  drawBalanceGraph();
+}
+
+function drawWeeklyGraph() {
+  const container = $("weeklyGraph");
+  container.replaceChildren();
+
+  const rows = [];
+  let key = state.weekStart;
+
+  // Build a continuous twelve-week range ending at the saved current week.
+  for (let i = 0; i < 12; i++) {
+    rows.unshift({ key, spend: 0, add: 0 });
+
+    const d = parseDate(key);
+    d.setDate(d.getDate() - 7);
+    key = dateKey(d);
+  }
+
+  const byWeek = new Map(rows.map(row => [row.key, row]));
+
+  for (const entry of state.entries) {
+    const row = byWeek.get(entry.weekStart);
+    if (!row) continue;
+
+    if (entry.type === "Spend") row.spend += entry.amountCents;
+    if (entry.type === "Add Money") row.add += entry.amountCents;
+  }
+
+  const width = 680;
+  const height = 320;
+  const left = 88;
+  const right = 16;
+  const top = 24;
+  const bottom = 70;
+  const plotWidth = width - left - right;
+  const plotHeight = height - top - bottom;
+
+  const maximum = Math.max(
+    WEEKLY_CENTS,
+    ...rows.flatMap(row => [row.spend, row.add])
+  );
+
+  const svg = createSvg(
+    width,
+    height,
+    "Weekly spending and added money for the most recent twelve weeks"
+  );
+
+  for (let i = 0; i <= 4; i++) {
+    const value = maximum * i / 4;
+    const y = top + plotHeight - plotHeight * i / 4;
+
+    svgElement(svg, "line", {
+      x1: left,
+      y1: y,
+      x2: width - right,
+      y2: y,
+      stroke: "#334155"
+    });
+
+    graphText(svg, left - 8, y + 4, money(value), "end");
+  }
+
+  const slot = plotWidth / rows.length;
+  const barWidth = Math.min(18, slot * 0.3);
+
+  rows.forEach((row, index) => {
+    const center = left + slot * (index + 0.5);
+
+    for (const [value, color, offset, label] of [
+      [row.spend, "#fb7185", -barWidth - 2, "Spending"],
+      [row.add, "#4ade80", 2, "Added money"]
+    ]) {
+      const barHeight = value / maximum * plotHeight;
+
+      const rect = svgElement(svg, "rect", {
+        x: center + offset,
+        y: top + plotHeight - barHeight,
+        width: barWidth,
+        height: barHeight,
+        rx: 3,
+        fill: color
+      });
+
+      const title = document.createElementNS(
+        "http://www.w3.org/2000/svg", "title"
+      );
+
+      title.textContent = `${row.key}: ${label} ${money(value)}`;
+      rect.append(title);
+    }
+
+    const label = graphText(
+      svg,
+      center,
+      top + plotHeight + 18,
+      row.key.slice(5),
+      "end"
+    );
+
+    label.setAttribute(
+      "transform",
+      `rotate(-45 ${center} ${top + plotHeight + 18})`
+    );
+  });
+
+  container.append(svg);
+
+  const description = document.createElement("p");
+  description.className = "muted";
+  description.textContent =
+    "Labels use month-day. Added money excludes the automatic $60 allowance.";
+
+  container.append(description);
+
+  // Exact values remain readable on small screens.
+  const details = document.createElement("details");
+  const heading = document.createElement("summary");
+  heading.textContent = "Show weekly amounts";
+  details.append(heading);
+
+  for (const row of rows.slice().reverse()) {
+    const item = document.createElement("p");
+    item.className = "muted";
+    item.textContent =
+      `${row.key}: spent ${money(row.spend)}, added ${money(row.add)}`;
+    details.append(item);
+  }
+
+  container.append(details);
+}
+
+function drawBalanceGraph() {
+  const container = $("balanceGraph");
+  container.replaceChildren();
+
+  const points = [
+    { balance: WEEKLY_CENTS, label: "Starting budget" },
+    ...state.entries.map(entry => ({
+      balance: entry.balanceCents,
+      label: `${entry.weekStart} — ${entry.type}`
+    }))
+  ];
+
+  const width = 680;
+  const height = 300;
+  const left = 92;
+  const right = 20;
+  const top = 24;
+  const bottom = 42;
+  const plotWidth = width - left - right;
+  const plotHeight = height - top - bottom;
+
+  let minimum = 0;
+  let maximum = WEEKLY_CENTS;
+
+  for (const point of points) {
+    minimum = Math.min(minimum, point.balance);
+    maximum = Math.max(maximum, point.balance);
+  }
+
+  if (maximum === minimum) maximum += WEEKLY_CENTS;
+
+  const range = maximum - minimum;
+
+  const x = index =>
+    left + index / Math.max(1, points.length - 1) * plotWidth;
+
+  const y = value =>
+    top + (maximum - value) / range * plotHeight;
+
+  const svg = createSvg(
+    width,
+    height,
+    "Budget balance over recorded entries, including weekly allowances"
+  );
+
+  for (let i = 0; i <= 4; i++) {
+    const value = minimum + range * i / 4;
+    const lineY = y(value);
+
+    svgElement(svg, "line", {
+      x1: left,
+      y1: lineY,
+      x2: width - right,
+      y2: lineY,
+      stroke: "#334155"
+    });
+
+    graphText(svg, left - 8, lineY + 4, money(value), "end");
+  }
+
+  svgElement(svg, "line", {
+    x1: left,
+    y1: y(0),
+    x2: width - right,
+    y2: y(0),
+    stroke: "#facc15",
+    "stroke-dasharray": "5 5"
+  });
+
+  const coordinates = points
+    .map((point, index) => `${x(index)},${y(point.balance)}`)
+    .join(" ");
+
+  svgElement(svg, "polyline", {
+    points: coordinates,
+    fill: "none",
+    stroke: "#60a5fa",
+    "stroke-width": 3,
+    "stroke-linejoin": "round",
+    "stroke-linecap": "round"
+  });
+
+  const markerStep = Math.max(1, Math.ceil(points.length / 60));
+
+  points.forEach((point, index) => {
+    if (
+      index % markerStep !== 0 &&
+      index !== points.length - 1
+    ) return;
+
+    const circle = svgElement(svg, "circle", {
+      cx: x(index),
+      cy: y(point.balance),
+      r: 4,
+      fill: point.balance < 0 ? "#fb7185" : "#60a5fa"
+    });
+
+    const title = document.createElementNS(
+      "http://www.w3.org/2000/svg", "title"
+    );
+
+    title.textContent = `${point.label}: ${money(point.balance)}`;
+    circle.append(title);
+  });
+
+  graphText(svg, left, height - 10, "Start");
+  graphText(svg, width - right, height - 10, "Latest", "end");
+
+  container.append(svg);
+
+  const description = document.createElement("p");
+  description.className = "muted";
+  description.textContent =
+    "Points are spaced by entry order, not elapsed time. " +
+    "The dashed yellow line marks a zero balance.";
+
+  container.append(description);
+}
+
+/* ---------------- Apple Shortcut URLs ---------------- */
+
+async function handleShortcut() {
+  const params = new URLSearchParams(location.search);
+  const hasSpend = params.has("spend");
+  const hasAdd = params.has("add");
+
+  if (!hasSpend && !hasAdd) return;
+
+  if (hasSpend && hasAdd) {
+    throw new Error("Use either spend or add in a Shortcut URL, not both.");
+  }
+
+  const type = hasSpend ? "spend" : "add";
+  const amount = parseAmount(params.get(type));
+  const id = params.get("id") || entryId();
+  const note =
+    (params.get("note") || "Apple Shortcut").slice(0, 200);
+
+  if (
+    id.length > 200 ||
+    !/^[A-Za-z0-9_-]+$/.test(id)
+  ) {
+    throw new Error(
+      "The Shortcut ID must contain only letters, numbers, hyphens, or underscores."
+    );
+  }
+
+  params.set("id", id);
+
+  history.replaceState(
+    null,
+    "",
+    location.pathname + "?" + params.toString() + location.hash
+  );
+
+  await recordTransaction(type, amount, note, id);
+
+  history.replaceState(
+    null,
+    "",
+    location.pathname + location.hash
+  );
+}
+
+/* ---------------- Token storage ---------------- */
+
+function readSavedToken() {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) ||
+      localStorage.getItem(LEGACY_TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function rememberToken() {
+  try {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function forgetSavedToken() {
+  if (busy) return;
+
+  if (!confirm(
+    "Remove the GitHub token saved in this browser? " +
+    "This does not revoke it on GitHub."
+  )) {
+    return;
+  }
+
+  try {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+
+    token = "";
+    state = null;
+    stateSha = null;
+
+    $("balance").textContent = "Locked";
+    $("balance").className = "balance";
+
+    for (const id of [
+      "week", "carryover", "spent", "added", "available"
+    ]) {
+      $(id).textContent = "—";
+    }
+
+    for (const id of [
+      "history", "advancedEntries",
+      "graphSummary", "weeklyGraph", "balanceGraph"
+    ]) {
+      $(id).replaceChildren();
+    }
+
+    notice("");
+
+    status(
+      "Saved token removed. Reload to enter a new token. " +
+      "Close other tracker tabs to stop their current sessions."
+    );
+
+    setBusy(false);
+  } catch (error) {
+    status("Could not remove the saved token: " + error.message);
+  }
+}
+
+/* ---------------- Startup ---------------- */
+
+async function start() {
+  setBusy(true);
+
+  let storageAvailable = true;
+
+  try {
+    token = readSavedToken();
+
+    if (!token) {
+      token = (prompt(
+        "Paste your GitHub fine-grained token.\n\n" +
+        "It will be remembered in this browser on this device. " +
+        "Only use this on a device you trust."
+      ) || "").trim();
+    }
+
+    if (!token) {
+      status("No token entered. Reload the page to try again.");
+      return;
+    }
+
+    const updated = await refreshInternal();
+
+    storageAvailable = rememberToken();
+
+    const params = new URLSearchParams(location.search);
+    const hasTransaction =
+      params.has("spend") || params.has("add");
+
+    if (hasTransaction) {
+      await handleShortcut();
+    } else if (updated) {
+      await exportAndBackup();
+    } else {
+      status("Budget loaded. Ready.");
+    }
+
+    if (!storageAvailable) {
+      status(
+        $("status").textContent +
+        "\nBrowser storage is unavailable. Your token will not be remembered."
+      );
+    }
+  } catch (error) {
+    status(error.message);
+  } finally {
     setBusy(false);
   }
 }
