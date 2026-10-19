@@ -3,26 +3,16 @@
   "weekStart": "2026-10-19",
   "carryoverCents": 0,
   "spentCents": 0,
-  "addedCents": 20000,
+  "addedCents": 0,
   "transactions": 3,
   "lastBackupTransaction": 0,
-  "entries": [
-    {
-      "id": "1283167a-89ed-4a94-b069-785eaf843774",
-      "date": "2026-10-19T23:08:35.453Z",
-      "weekStart": "2026-10-19",
-      "type": "Add Money",
-      "amountCents": 20000,
-      "balanceCents": 26000,
-      "note": ""
-    }
-  ],
+  "entries": [],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-19T23:08:35.454Z",
-  "available": 260,
+  "lastUpdated": "2026-10-19T23:09:40.493Z",
+  "available": 60,
   "carryover": 0,
   "spentThisWeek": 0,
-  "addedThisWeek": 200,
+  "addedThisWeek": 0,
   "weeklyAllowance": 60,
   "deletedEntries": [
     {
@@ -44,6 +34,16 @@
       "balanceCents": 5000,
       "note": "",
       "deletedAt": "2026-10-19T23:07:54.049Z"
+    },
+    {
+      "id": "1283167a-89ed-4a94-b069-785eaf843774",
+      "date": "2026-10-19T23:08:35.453Z",
+      "weekStart": "2026-10-19",
+      "type": "Add Money",
+      "amountCents": 20000,
+      "balanceCents": 26000,
+      "note": "",
+      "deletedAt": "2026-10-19T23:09:40.493Z"
     }
   ]
 }
