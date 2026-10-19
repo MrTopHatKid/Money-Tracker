@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekly Money Limit</title>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .card {
+    max-width: 520px;
+    margin: auto;
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+
+  .sub {
+    color: #94a3b8;
+    font-size: 14px;
+    margin: 0 0 16px;
+  }
+
+  .balance {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+
+  .positive { color: #4ade80; }
+  .zero { color: #facc15; }
+  .negative { color: #f87171; }
+
+  .info,
+  .status {
+    background: #334155;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+
+  .alert {
+    background: #7f1d1d;
+    border: 1px solid #ef4444;
+    color: #fecaca;
+    padding: 12px;
+    border-radius: 12px;
+    margin: 12px 0;
+    display: none;
+  }
+
+  input,
+  button {
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 12px;
+    border: none;
+    outline: none;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #0f172a;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+    background: #3b82f6;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  button.green { background: #22c55e; }
+  button.gray { background: #475569; }
+  button.red { background: #ef4444; }
+
+  .history {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  .history div {
+    padding: 8px 0;
+    border-bottom: 1px solid #334155;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Weekly Money Limit</h1>
+  <p class="sub">
+    Base allowance: $60 per week • Unused money carries over
+  </p>
+
+  <div id="alert" class="alert"></div>
+
+  <div class="info">
+    <div>Week starting: <span id="weekLabel">--</span></div>
+    <div>Carryover balance: <span id="carryoverLabel">--</span></div>
+    <div>Spent this week: <span id="spentLabel">--</span></div>
+    <div>Available to spend: <span id="availableLabel">--</span></div>
+    <div>Excel file: <span id="fileLabel">--</span></div>
+  </div>
+
+  <div class="balance" id="balance">Loading...</div>
+
+  <div class="status" id="status">Connecting to GitHub...</div>
+
+  <input id="amount" type="number" step="0.01" placeholder="Enter amount">
+
+  <button onclick="spendMoney()">Spend Money</button>
+
+  <button class="green" onclick="addMoney()">
+    Add Money / Pay Negative Balance
+  </button>
+
+  <button class="gray" onclick="noSpendWeek()">
+    No-Spend Week: Add $60 to Balance
+  </button>
+
+  <button class="gray" onclick="backupNow()">
+    Backup Excel Now
+  </button>
+
+  <button class="red" onclick="resetAll()">
+    Reset All Data
+  </button>
+
+  <div class="history" id="history"></div>
+</div>
+
+<script>
+const CONFIG = {
+  githubUsername: "YOUR_GITHUB_USERNAME",
+  githubRepo: "YOUR_REPOSITORY_NAME",
+  githubBranch: "main",
+  excelPath: "budget.xlsx",
+  jsonPath: "budget.json",
+  backupFolder: "backups",
+  githubToken: "YOUR_FINE_GRAINED_GITHUB_TOKEN",
+  backupEveryEntries: 10
+};
+
+const WEEKLY_LIMIT = 60;
+const API_BASE = "https://api.github.com";
+
+let data = {
+  weekStart: getWeekStart(new Date()).toISOString(),
+  carryover: 0,
+  spentThisWeek: 0,
+  entries: []
+};
+
+let excelSha = null;
+let jsonSha = null;
+let loadedFromGitHub = false;
+
+function getWeekStart(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+
+  return d;
+}
+
+function setStatus(text) {
+  document.getElementById("status").textContent = text;
+}
+
+function showAlert(message) {
+  const alertBox = document.getElementById("alert");
+  alertBox.textContent = message;
+  alertBox.style.display = "block";
+
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 6000);
+}
+
+function githubHeaders() {
+  return {
+    "Accept": "application/vnd.github+json",
+    "Authorization": "Bearer " + CONFIG.githubToken,
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+}
+
+function fileUrl(path) {
+  return `${API_BASE}/repos/${CONFIG.githubUsername}/${CONFIG.githubRepo}/contents/${encodeURIComponent(path)}?ref=${CONFIG.githubBranch}`;
+}
+
+function rawJsonUrl() {
+  return `https://raw.githubusercontent.com/${CONFIG.githubUsername}/${CONFIG.githubRepo}/${CONFIG.githubBranch}/${CONFIG.jsonPath}`;
+}
+
+async function loadFromGitHub() {
+  try {
+    setStatus("Loading budget from GitHub...");
+
+    const response = await fetch(fileUrl(CONFIG.jsonPath), {
+      headers: githubHeaders()
+    });
+
+    if (response.status === 404) {
+      jsonSha = null;
+      excelSha = null;
+      loadedFromGitHub = true;
+
+      setStatus("No budget found. A new budget will be created.");
+      render();
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error("GitHub load failed: " + response.status);
+    }
+
+    const json = await response.json();
+    jsonSha = json.sha;
+
+    const savedData = JSON.parse(atob(json.content));
+
+    data = {
+      weekStart: savedData.weekStart || getWeekStart(new Date()).toISOString(),
+      carryover: Number(savedData.carryover || 0),
+      spentThisWeek: Number(savedData.spentThisWeek || 0),
+      entries: savedData.entries || []
+    };
+
+    loadedFromGitHub = true;
+
+    setStatus("Loaded current budget from GitHub.");
+    render();
+
+  } catch (error) {
+    console.error(error);
+
+    setStatus("Could not load budget.");
+    showAlert(
+      "Could not load budget.json. Check your GitHub username, repository, branch, token, and internet connection."
+    );
+  }
+}
+
+function availableMoney() {
+  return WEEKLY_LIMIT + data.carryover - data.spentThisWeek;
+}
+
+function buildJson() {
+  return JSON.stringify({
+    weekStart: data.weekStart,
+    carryover: data.carryover,
+    spentThisWeek: data.spentThisWeek,
+    available: availableMoney(),
+    lastUpdated: new Date().toISOString(),
+    entries: data.entries
+  }, null, 2);
+}
+
+function buildWorkbook() {
+  const workbook = XLSX.utils.book_new();
+
+  const rows = [
+    [
+      "Date",
+      "Type",
+      "Amount",
+      "CarryoverAfter",
+      "AvailableAfter",
+      "Note"
+    ]
+  ];
+
+  let runningCarryover = 0;
+  let runningSpent = 0;
+
+  data.entries.forEach(entry => {
+    if (entry.type === "Spend") {
+      runningSpent += entry.amount;
+    } else if (entry.type === "Add") {
+      runningCarryover += entry.amount;
+    } else if (entry.type === "Debt Payment") {
+      runningCarryover += entry.amount;
+    } else if (entry.type === "Week Start") {
+      runningCarryover = Number(entry.carryoverAfter || runningCarryover);
+      runningSpent = 0;
+    }
+
+    const available = WEEKLY_LIMIT + runningCarryover - runningSpent;
+
+    rows.push([
+      entry.date,
+      entry.type,
+      entry.amount,
+      runningCarryover.toFixed(2),
+      available.toFixed(2),
+      entry.note
+    ]);
+  });
+
+  const sheet = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(workbook, sheet, "Budget");
+
+  return XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "base64"
+  });
+}
+
+async function saveGitHubFile(path, content, sha, commitMessage, encoding = "base64") {
+  const body = {
+    message: commitMessage,
+    content: content,
+    branch: CONFIG.githubBranch
+  };
+
+  if (sha) {
+    body.sha = sha;
+  }
+
+  const response = await fetch(fileUrl(path), {
+    method: "PUT",
+    headers: {
+      ...githubHeaders(),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `GitHub save failed for ${path}: ${response.status} ${errorText}`
+    );
+  }
+
+  const json = await response.json();
+  return json.content.sha;
+}
+
+async function saveAll(commitMessage) {
+  if (!loadedFromGitHub) {
+    showAlert("Budget is still loading. Try again in a moment.");
+    return false;
+  }
+
+  try {
+    setStatus("Saving budget and Excel file...");
+
+    const jsonContent = btoa(buildJson());
+    const excelContent = buildWorkbook();
+
+    jsonSha = await saveGitHubFile(
+      CONFIG.jsonPath,
+      jsonContent,
+      jsonSha,
+      commitMessage
+    );
+
+    excelSha = await saveGitHubFile(
+      CONFIG.excelPath,
+      excelContent,
+      excelSha,
+      commitMessage
+    );
+
+    setStatus("Saved to GitHub: " + new Date().toLocaleTimeString());
+    return true;
+
+  } catch (error) {
+    console.error(error);
+
+    setStatus("Save failed.");
+    showAlert("Could not save budget.json or budget.xlsx to GitHub.");
+
+    return false;
+  }
+}
+
+async function createBackup(reason) {
+  try {
+    setStatus("Creating Excel backup...");
+
+    const content = buildWorkbook();
+
+    const date = new Date().toISOString().slice(0, 10);
+    const time = new Date().toTimeString().slice(0, 8).replace(/:/g, "-");
+
+    const path = `${CONFIG.backupFolder}/budget-backup-${date}-${time}.xlsx`;
+
+    await saveGitHubFile(
+      path,
+      content,
+      null,
+      "Backup budget data: " + reason
+    );
+
+    setStatus("Backup created: " + path);
+    return true;
+
+  } catch (error) {
+    console.error(error);
+
+    setStatus("Backup failed.");
+    showAlert("Could not create backup file.");
+
+    return false;
+  }
+}
+
+function addEntry(type, amount, note, carryoverAfter = null) {
+  const entry = {
+    type,
+    amount,
+    date: new Date().toISOString(),
+    note
+  };
+
+  if (carryoverAfter !== null) {
+    entry.carryoverAfter = carryoverAfter;
+  }
+
+  data.entries.push(entry);
+  render();
+}
+
+async function spendMoney() {
+  const amount = parseFloat(document.getElementById("amount").value);
+
+  if (isNaN(amount) || amount <= 0) {
+    showAlert("Enter a valid amount to spend.");
+    return;
+  }
+
+  addEntry(
+    "Spend",
+    amount,
+    "Spent $" + amount.toFixed(2)
+  );
+
+  data.spentThisWeek += amount;
+
+  document.getElementById("amount").value = "";
+  render();
+
+  const saved = await saveAll(
+    "Add spending entry: $" + amount.toFixed(2)
+  );
+
+  if (
+    saved &&
+    data.entries.length % CONFIG.backupEveryEntries === 0
+  ) {
+    await createBackup(
+      "automatic backup after " + data.entries.length + " entries"
+    );
+  }
+
+  if (availableMoney() <= 0) {
+    showAlert(
+      "Weekly limit reached. Extra spending becomes a negative carryover and reduces next week’s budget."
+    );
+  }
+}
+
+async function addMoney() {
+  const amount = parseFloat(document.getElementById("amount").value);
+
+  if (isNaN(amount) || amount <= 0) {
+    showAlert("Enter a valid amount to add.");
+    return;
+  }
+
+  const currentAvailable = availableMoney();
+
+  if (currentAvailable < 0) {
+    addEntry(
+      "Debt Payment",
+      amount,
+      "Paid $" + amount.toFixed(2) + " toward negative balance"
+    );
+
+    data.carryover += amount;
+  } else {
+    addEntry(
+      "Add",
+      amount,
+      "Added $" + amount.toFixed(2) + " to available money"
+    );
+
+    data.carryover += amount;
+  }
+
+  document.getElementById("amount").value = "";
+  render();
+
+  await saveAll(
+    "Add money/payment entry: $" + amount.toFixed(2)
+  );
+}
+
+async function noSpendWeek() {
+  addEntry(
+    "Debt Payment",
+    60,
+    "No-spend week: added $60.00 to carryover balance"
+  );
+
+  data.carryover += 60;
+  render();
+
+  await saveAll(
+    "No-spend week: added $60 to carryover balance"
+  );
+}
+
+async function backupNow() {
+  await createBackup("manual backup");
+}
+
+async function resetAll() {
+  if (!confirm("Delete all budget data and create a new Excel file?")) {
+    return;
+  }
+
+  data = {
+    weekStart: getWeekStart(new Date()).toISOString(),
+    carryover: 0,
+    spentThisWeek: 0,
+    entries: []
+  };
+
+  render();
+
+  await saveAll("Reset budget data");
+}
+
+function checkNewWeek() {
+  const thisWeek = getWeekStart(new Date());
+  const storedWeek = new Date(data.weekStart);
+
+  if (thisWeek.getTime() !== storedWeek.getTime()) {
+    const remaining = WEEKLY_LIMIT + data.carryover - data.spentThisWeek;
+
+    data.weekStart = thisWeek.toISOString();
+    data.carryover = remaining;
+    data.spentThisWeek = 0;
+
+    let note;
+
+    if (remaining >= 0) {
+      note =
+        "New week started. $" +
+        remaining.toFixed(2) +
+        " carried over from last week.";
+    } else {
+      note =
+        "New week started. Negative $" +
+        Math.abs(remaining).toFixed(2) +
+        " carried into this week.";
+    }
+
+    addEntry(
+      "Week Start",
+      WEEKLY_LIMIT,
+      note,
+      remaining
+    );
+
+    saveAll(
+      "Start new weekly budget period; carryover: $" +
+      remaining.toFixed(2)
+    );
+  }
+}
+
+function render() {
+  const available = availableMoney();
+  const balance = document.getElementById("balance");
+
+  balance.textContent = "$" + available.toFixed(2);
+  balance.className = "balance";
+
+  if (available < 0) {
+    balance.classList.add("negative");
+  } else if (available === 0) {
+    balance.classList.add("zero");
+  } else {
+    balance.classList.add("positive");
+  }
+
+  document.getElementById("weekLabel").textContent =
+    new Date(data.weekStart).toLocaleDateString();
+
+  document.getElementById("carryoverLabel").textContent =
+    "$" + data.carryover.toFixed(2);
+
+  document.getElementById("spentLabel").textContent =
+    "$" + data.spentThisWeek.toFixed(2);
+
+  document.getElementById("availableLabel").textContent =
+    "$" + available.toFixed(2);
+
+  document.getElementById("fileLabel").textContent =
+    `${CONFIG.githubUsername}/${CONFIG.githubRepo}/${CONFIG.excelPath}`;
+
+  const history = document.getElementById("history");
+  history.innerHTML = "";
+
+  [...data.entries]
+    .reverse()
+    .slice(0, 25)
+    .forEach(entry => {
+      const div = document.createElement("div");
+      div.textContent =
+        new Date(entry.date).toLocaleString() +
+        " — " +
+        entry.note;
+      history.appendChild(div);
+    });
+
+  if (available <= 0) {
+    showAlert(
+      "Weekly limit reached. You cannot spend more without increasing your negative balance."
+    );
+  }
+}
+
+function handleShortcutURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  const spend = parseFloat(params.get("spend"));
+  const add = parseFloat(params.get("add"));
+  const noSpend = params.get("nospend");
+
+  if (!isNaN(spend) && spend > 0) {
+    document.getElementById("amount").value = spend;
+    spendMoney();
+  }
+
+  if (!isNaN(add) && add > 0) {
+    document.getElementById("amount").value = add;
+    addMoney();
+  }
+
+  if (noSpend === "1") {
+    noSpendWeek();
+  }
+
+  if (params.toString()) {
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+  }
+}
+
+loadFromGitHub().then(() => {
+  checkNewWeek();
+  handleShortcutURL();
+  render();
+});
+</script>
+
+</body>
+</html>
