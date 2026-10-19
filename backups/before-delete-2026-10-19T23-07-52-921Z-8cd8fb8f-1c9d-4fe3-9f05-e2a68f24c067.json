@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "weekStart": "2026-10-19",
+  "carryoverCents": 0,
+  "spentCents": 1000,
+  "addedCents": 0,
+  "transactions": 2,
+  "lastBackupTransaction": 0,
+  "entries": [
+    {
+      "id": "64487cc7-f993-4ae1-a49a-e6bcad363c16",
+      "date": "2026-10-19T22:52:54.000Z",
+      "weekStart": "2026-10-19",
+      "type": "Spend",
+      "amountCents": 1000,
+      "balanceCents": 5000,
+      "note": ""
+    }
+  ],
+  "processedShortcutIds": [],
+  "lastUpdated": "2026-10-19T23:07:48.841Z",
+  "available": 50,
+  "carryover": 0,
+  "spentThisWeek": 10,
+  "addedThisWeek": 0,
+  "weeklyAllowance": 60,
+  "deletedEntries": [
+    {
+      "id": "84bb21af-aa25-4817-9f92-87c15e5c3292",
+      "date": "2026-10-19T23:02:11.567Z",
+      "weekStart": "2026-10-19",
+      "type": "Spend",
+      "amountCents": 1800,
+      "balanceCents": 3200,
+      "note": "",
+      "deletedAt": "2026-10-19T23:07:48.841Z"
+    }
+  ]
+}
