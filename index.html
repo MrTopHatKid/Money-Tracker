@@ -3,165 +3,440 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Money Tracker</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
 <style>
-  :root {
-    color-scheme: dark;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-  }
+:root {
+  color-scheme: dark;
+  --bg: #0b1120;
+  --card: #151e30;
+  --line: #28344c;
+  --text: #edf2ff;
+  --muted: #95a3bd;
+  --green: #62e5b0;
+  --red: #ff8199;
+  --blue: #829bff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-  * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    padding: 24px 16px;
-  }
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at top left, #21325d66, transparent 60%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-  main {
-    max-width: 580px;
-    margin: auto;
-    padding: 24px;
-    background: #1e293b;
-    border-radius: 20px;
-    box-shadow: 0 12px 40px #0004;
-  }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .4; cursor: not-allowed; }
 
-  h1 { margin: 0 0 8px; font-size: 26px; }
-  h2 { font-size: 18px; margin-top: 26px; }
+.app {
+  max-width: 860px;
+  margin: auto;
+  padding: 24px 18px 50px;
+}
 
-  .muted, small { color: #94a3b8; }
-  .muted { line-height: 1.5; }
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
 
-  .balance {
-    font-size: clamp(36px, 10vw, 56px);
-    font-weight: 750;
-    margin: 20px 0;
-    overflow-wrap: anywhere;
-  }
+h1 { font-size: 24px; margin: 0 0 5px; }
+h2 { font-size: 17px; margin: 0; }
+p { line-height: 1.6; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
 
-  .positive { color: #4ade80; }
-  .negative { color: #fb7185; }
-  .zero { color: #facc15; }
+.badge {
+  background: #263451;
+  padding: 8px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  white-space: nowrap;
+}
 
-  .panel {
-    background: #0f172a;
-    padding: 16px;
-    border-radius: 12px;
-    margin: 16px 0;
-    line-height: 1.7;
-    overflow-wrap: anywhere;
-  }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
 
-  #notice {
-    display: none;
-    background: #7f1d1d;
-    color: #fecaca;
-    padding: 14px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    white-space: pre-wrap;
-  }
+.hero {
+  background: linear-gradient(135deg, #223760, #18243d 65%);
+  position: relative;
+  overflow: hidden;
+}
 
-  #status {
-    color: #cbd5e1;
-    font-size: 14px;
-    white-space: pre-wrap;
-  }
+.balance {
+  font-size: clamp(42px, 9vw, 66px);
+  font-weight: 760;
+  letter-spacing: -2px;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
 
-  label { display: block; margin-bottom: 8px; }
+.positive { color: var(--green); }
+.negative { color: var(--red); }
 
-  input, button {
-    width: 100%;
-    padding: 13px;
-    border-radius: 10px;
-    font: inherit;
-  }
+.hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  border-top: 1px solid #ffffff18;
+  padding-top: 16px;
+}
 
-  input {
-    color: white;
-    background: #0f172a;
-    border: 1px solid #475569;
-    margin-bottom: 12px;
-  }
+.hero-bottom strong { display: block; margin-top: 5px; }
 
-  button {
-    border: 0;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 10px;
-    font-weight: 650;
-  }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
 
-  button.green { background: #15803d; }
-  button.gray { background: #475569; }
-  button:disabled { opacity: .45; cursor: not-allowed; }
+.stat {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+}
 
-  .entry {
-    border-bottom: 1px solid #334155;
-    padding: 12px 0;
-  }
+.stat .value {
+  font-size: 21px;
+  font-weight: 700;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
 
-  .entry small { display: block; margin-top: 4px; }
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(78px, 1fr));
+  gap: 9px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.day {
+  background: #0e1626;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-align: center;
+  padding: 12px 6px;
+}
+
+.day.today {
+  border-color: var(--blue);
+  background: #233050;
+}
+
+.day.future { opacity: .55; }
+.day-name { font-size: 12px; color: var(--muted); }
+.day-date { font-weight: 700; margin: 6px 0; }
+.day-spend { font-size: 12px; color: var(--red); }
+.day-add { font-size: 11px; color: var(--green); min-height: 16px; }
+
+.bar-track {
+  height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.bar {
+  width: 16px;
+  border-radius: 5px;
+  background: linear-gradient(var(--blue), #4762c6);
+  min-height: 3px;
+}
+
+label {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #0e1626;
+  border-radius: 12px;
+  color: white;
+  padding: 14px;
+  margin-bottom: 15px;
+  outline: none;
+}
+
+input:focus { border-color: var(--blue); }
+
+.amount-input { font-size: 27px; font-weight: 650; }
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  color: white;
+  background: #344974;
+  font-weight: 650;
+}
+
+.spend { background: #495dd6; }
+.add { background: #167657; }
+.secondary { background: #24314b; font-size: 13px; }
+.danger { color: #ffb5c3; }
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tools button { flex: 1; min-width: 115px; }
+
+#status {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: pre-wrap;
+  margin: 15px 0 0;
+  overflow-wrap: anywhere;
+}
+
+#notice {
+  display: none;
+  padding: 13px;
+  border-radius: 12px;
+  color: #ffc1ce;
+  background: #622b3d;
+  margin-bottom: 18px;
+}
+
+.entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 15px 0;
+}
+
+.entry:last-child { border-bottom: none; }
+.entry-title { font-size: 14px; font-weight: 650; }
+.entry-details { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.entry-amount { text-align: right; font-weight: 700; white-space: nowrap; }
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 25px 0;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #0b1120f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+}
+
+.loading-box { text-align: center; max-width: 380px; }
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #263451;
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  margin: 0 auto 22px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#login {
+  display: none;
+  text-align: left;
+  margin-top: 22px;
+}
+
+#login button { width: 100%; }
+#loginError { color: var(--red); font-size: 13px; white-space: pre-wrap; }
+
+@media (max-width: 480px) {
+  .app { padding: 20px 13px 35px; }
+  .card { padding: 18px; border-radius: 18px; }
+  .stats { gap: 8px; }
+  .stat { padding: 12px 9px; }
+  .stat .value { font-size: 17px; }
+  h1 { font-size: 21px; }
+}
 </style>
 </head>
 
 <body>
-<main>
-  <h1>Money Tracker</h1>
-  <div class="muted">
-    $60 added every Monday. All unused money and debt carry forward.
-  </div>
+<div id="overlay" aria-live="polite">
+  <div class="loading-box">
+    <div class="spinner" id="spinner"></div>
+    <h2 id="loadingTitle">Opening your tracker</h2>
+    <p class="muted" id="loadingText">Loading your budget and weekly activity…</p>
 
-  <div id="balance" class="balance">—</div>
+    <form id="login">
+      <label for="tokenInput">GitHub fine-grained token</label>
+      <input
+        id="tokenInput"
+        type="password"
+        autocomplete="off"
+        placeholder="github_pat_..."
+      >
+      <p class="small muted">
+        Saved in this browser on this device. Only use this on a device you trust.
+      </p>
+      <button type="submit">Connect tracker</button>
+      <p id="loginError"></p>
+    </form>
+  </div>
+</div>
+
+<main class="app">
+  <header>
+    <div>
+      <h1>Money Tracker</h1>
+      <div class="muted small" id="todayLabel"></div>
+    </div>
+    <span class="badge">$60 / week</span>
+  </header>
+
   <div id="notice" role="alert"></div>
 
-  <div class="panel">
-    <div>Week starting: <span id="week">—</span></div>
-    <div>Opening carryover: <span id="carryover">—</span></div>
-    <div>Spent this week: <span id="spent">—</span></div>
-    <div>Added this week: <span id="added">—</span></div>
-    <div>Available now: <span id="available">—</span></div>
+  <section class="card hero">
+    <div class="muted">Available to spend</div>
+    <div class="balance" id="balance">—</div>
+    <div class="small muted">Unused money and negative balances carry forward.</div>
+
+    <div class="hero-bottom">
+      <div>
+        <span class="muted small">Daily guide</span>
+        <strong id="dailyGuide">—</strong>
+      </div>
+      <div>
+        <span class="muted small">Next allowance</span>
+        <strong id="nextAllowance">—</strong>
+      </div>
+      <div>
+        <span class="muted small">Week starting</span>
+        <strong id="weekLabel">—</strong>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="muted small">Carryover</div>
+      <div class="value" id="carryover">—</div>
+    </div>
+    <div class="stat">
+      <div class="muted small">Spent this week</div>
+      <div class="value negative" id="spent">—</div>
+    </div>
+    <div class="stat">
+      <div class="muted small">Added this week</div>
+      <div class="value positive" id="added">—</div>
+    </div>
   </div>
 
-  <p id="status" role="status">Connecting…</p>
+  <section class="card">
+    <div class="section-title">
+      <h2>Day by day</h2>
+      <span class="small muted">This week</span>
+    </div>
+    <div class="days" id="days"></div>
+    <p class="small muted">
+      Bars show actual spending. The daily guide divides your available
+      balance across today through Sunday; it does not add money.
+    </p>
+  </section>
 
-  <label for="amount">Amount</label>
-  <input
-    id="amount"
-    type="number"
-    min="0.01"
-    step="0.01"
-    inputmode="decimal"
-    placeholder="0.00"
-  >
+  <section class="card">
+    <div class="section-title"><h2>Add an entry</h2></div>
 
-  <label for="note">Note (optional)</label>
-  <input id="note" type="text" maxlength="200" placeholder="Lunch, repayment…">
+    <label for="amount">Amount</label>
+    <input
+      id="amount"
+      class="amount-input"
+      type="number"
+      inputmode="decimal"
+      min="0.01"
+      step="0.01"
+      placeholder="0.00"
+    >
 
-  <button data-action onclick="submitEntry('spend')">Spend Money</button>
-  <button data-action class="green" onclick="submitEntry('add')">
-    Add Money / Pay Debt
-  </button>
-  <button data-action class="gray" onclick="refreshBudget()">
-    Refresh Budget
-  </button>
-  <button data-action class="gray" onclick="backupNow()">
-    Backup Excel Now
-  </button>
+    <label for="note">Note (optional)</label>
+    <input id="note" maxlength="200" placeholder="Lunch, shopping, repayment…">
 
-  <p class="muted">
-    A no-spend week needs no button: when the next Monday arrives,
-    your unused balance stays and another $60 is added.
+    <div class="actions">
+      <button data-action class="spend" onclick="submitEntry('spend')">
+        − Spend
+      </button>
+      <button data-action class="add" onclick="submitEntry('add')">
+        + Add money
+      </button>
+    </div>
+
+    <p id="status" role="status">Connecting…</p>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>Recent activity</h2>
+      <span id="entryCount" class="small muted"></span>
+    </div>
+    <div id="history"></div>
+  </section>
+
+  <div class="tools">
+    <button data-action class="secondary" onclick="refreshBudget()">Refresh</button>
+    <button data-action class="secondary" onclick="backupNow()">Backup Excel</button>
+    <button data-action class="secondary danger" onclick="forgetToken()">
+      Forget token
+    </button>
+  </div>
+
+  <p class="small muted">
+    No-spend weeks work automatically: keep your remaining balance and
+    receive another $60 each Monday. Backups are created every 10 money
+    entries, or manually above.
   </p>
-
-  <h2>Recent history</h2>
-  <div id="history"></div>
 </main>
 
 <script>
@@ -177,14 +452,14 @@ const CONFIG = {
   backupEvery: 10
 };
 
-const WEEKLY_CENTS = 6000;
+const TOKEN_KEY = "money-tracker-github-token";
+const WEEKLY = 6000;
+const $ = id => document.getElementById(id);
 
 let token = "";
 let state = null;
 let stateSha = null;
 let busy = true;
-
-const $ = id => document.getElementById(id);
 
 function money(cents) {
   return new Intl.NumberFormat("en-CA", {
@@ -193,13 +468,42 @@ function money(cents) {
   }).format(cents / 100);
 }
 
-function status(message) {
-  $("status").textContent = message;
+function key(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
 }
 
-function notice(message = "") {
-  $("notice").textContent = message;
-  $("notice").style.display = message ? "block" : "none";
+function parseDay(value) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d, 12);
+}
+
+function monday(date = new Date()) {
+  const d = new Date(date);
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return key(d);
+}
+
+function shiftDay(value, days) {
+  const d = parseDay(value);
+  d.setDate(d.getDate() + days);
+  return key(d);
+}
+
+function id() {
+  return crypto.randomUUID();
+}
+
+function balance(s = state) {
+  return s.carryoverCents + WEEKLY + s.addedCents - s.spentCents;
+}
+
+function setStatus(text) {
+  $("status").textContent = text;
 }
 
 function setBusy(value) {
@@ -209,41 +513,15 @@ function setBusy(value) {
   });
 }
 
-function dateKey(date) {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0")
-  ].join("-");
+function showNotice(text) {
+  $("notice").textContent = text;
+  $("notice").style.display = text ? "block" : "none";
 }
 
-function parseDate(key) {
-  const [year, month, day] = key.split("-").map(Number);
-  return new Date(year, month - 1, day, 12);
-}
-
-function mondayKey(date = new Date()) {
-  const d = new Date(date);
-  d.setHours(12, 0, 0, 0);
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-  return dateKey(d);
-}
-
-function nextMonday(key) {
-  const d = parseDate(key);
-  d.setDate(d.getDate() + 7);
-  return dateKey(d);
-}
-
-function available(s = state) {
-  return s.carryoverCents + WEEKLY_CENTS
-    + s.addedCents - s.spentCents;
-}
-
-function newState() {
+function freshState() {
   return {
     version: 2,
-    weekStart: mondayKey(),
+    weekStart: monday(),
     carryoverCents: 0,
     spentCents: 0,
     addedCents: 0,
@@ -255,38 +533,7 @@ function newState() {
   };
 }
 
-function entryId() {
-  return crypto.randomUUID();
-}
-
-function addWeeks(s) {
-  const current = mondayKey();
-  let changed = false;
-
-  while (s.weekStart < current) {
-    const remaining = available(s);
-    s.weekStart = nextMonday(s.weekStart);
-    s.carryoverCents = remaining;
-    s.spentCents = 0;
-    s.addedCents = 0;
-
-    s.entries.push({
-      id: entryId(),
-      date: new Date().toISOString(),
-      weekStart: s.weekStart,
-      type: "Week Start",
-      amountCents: WEEKLY_CENTS,
-      balanceCents: available(s),
-      note: "Weekly allowance added; previous balance carried forward."
-    });
-
-    changed = true;
-  }
-
-  return changed;
-}
-
-function validateState(s) {
+function validate(s) {
   if (
     s.version !== 2 ||
     !/^\d{4}-\d{2}-\d{2}$/.test(s.weekStart || "") ||
@@ -302,10 +549,37 @@ function validateState(s) {
   ) {
     throw new Error(
       "This budget uses an older or unsupported format. " +
-      "Existing data has not been overwritten. " +
-      "Back it up before migrating to this version."
+      "Your files have not been overwritten. Back them up before migration."
     );
   }
+}
+
+function advanceWeeks(s) {
+  let changed = false;
+  const current = monday();
+
+  while (s.weekStart < current) {
+    const remaining = balance(s);
+    s.weekStart = shiftDay(s.weekStart, 7);
+    s.carryoverCents = remaining;
+    s.spentCents = 0;
+    s.addedCents = 0;
+
+    s.entries.push({
+      id: id(),
+      date: new Date().toISOString(),
+      weekStart: s.weekStart,
+      localDate: s.weekStart,
+      type: "Week Start",
+      amountCents: WEEKLY,
+      balanceCents: balance(s),
+      note: "Weekly allowance added; previous balance carried forward."
+    });
+
+    changed = true;
+  }
+
+  return changed;
 }
 
 function encodeText(text) {
@@ -315,17 +589,18 @@ function encodeText(text) {
   return btoa(binary);
 }
 
-function decodeText(base64) {
-  const binary = atob(base64.replace(/\s/g, ""));
-  const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
+function decodeText(content) {
+  const binary = atob(content.replace(/\s/g, ""));
+  return new TextDecoder().decode(
+    Uint8Array.from(binary, char => char.charCodeAt(0))
+  );
 }
 
-function apiUrl(path, read = false) {
-  const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+function endpoint(path, read) {
+  const encoded = path.split("/").map(encodeURIComponent).join("/");
   let url =
     `https://api.github.com/repos/${encodeURIComponent(CONFIG.owner)}` +
-    `/${encodeURIComponent(CONFIG.repo)}/contents/${encodedPath}`;
+    `/${encodeURIComponent(CONFIG.repo)}/contents/${encoded}`;
 
   if (read) {
     url += `?ref=${encodeURIComponent(CONFIG.branch)}&t=${Date.now()}`;
@@ -335,7 +610,7 @@ function apiUrl(path, read = false) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(apiUrl(path, !options.method), {
+  const response = await fetch(endpoint(path, !options.method), {
     ...options,
     cache: "no-store",
     headers: {
@@ -349,56 +624,52 @@ async function api(path, options = {}) {
   if (response.status === 404 && !options.method) return null;
 
   if (!response.ok) {
-    let message = "";
-    try {
-      message = (await response.json()).message || "";
-    } catch {}
+    let detail = "";
+    try { detail = (await response.json()).message || ""; } catch {}
+
+    if (response.status === 401) {
+      throw new Error("Token is invalid or expired. Forget it and enter a new one.");
+    }
 
     if (response.status === 409 || response.status === 422) {
       throw new Error(
-        `GitHub rejected the update (${response.status}). ` +
-        "Another update may have happened. Refresh before trying again. " +
-        message
+        "Update conflict. Refresh and check your history before retrying. " + detail
       );
     }
 
-    throw new Error(`GitHub error ${response.status}: ${message}`);
+    throw new Error(`GitHub ${response.status}: ${detail}`);
   }
 
   return response.json();
 }
 
-async function readState() {
+async function loadState() {
   const file = await api(CONFIG.jsonPath);
 
   if (!file) {
-    // Avoid silently replacing an existing Excel-only budget.
     const excel = await api(CONFIG.excelPath);
 
     if (excel) {
       throw new Error(
-        "budget.xlsx exists but budget.json does not. " +
-        "Your existing Excel budget needs migration first; " +
-        "this version will not overwrite it."
+        "An Excel-only budget already exists. Back up and migrate those files " +
+        "before starting this version. Nothing was overwritten."
       );
     }
 
-    return { state: newState(), sha: null };
+    return { data: freshState(), sha: null };
   }
 
   const loaded = JSON.parse(decodeText(file.content));
-  validateState(loaded);
-
-  return { state: loaded, sha: file.sha };
+  validate(loaded);
+  return { data: loaded, sha: file.sha };
 }
 
-async function commitState(candidate, sha, message) {
+async function saveState(candidate, sha, message) {
   candidate.lastUpdated = new Date().toISOString();
 
-  // Convenient decimal fields for Apple Shortcuts.
-  const document = {
+  const output = {
     ...candidate,
-    available: available(candidate) / 100,
+    available: balance(candidate) / 100,
     carryover: candidate.carryoverCents / 100,
     spentThisWeek: candidate.spentCents / 100,
     addedThisWeek: candidate.addedCents / 100,
@@ -408,7 +679,7 @@ async function commitState(candidate, sha, message) {
   const body = {
     message,
     branch: CONFIG.branch,
-    content: encodeText(JSON.stringify(document, null, 2))
+    content: encodeText(JSON.stringify(output, null, 2))
   };
 
   if (sha) body.sha = sha;
@@ -421,12 +692,12 @@ async function commitState(candidate, sha, message) {
   return result.content.sha;
 }
 
-function workbookContent(s) {
+function workbook(s) {
   if (!window.XLSX) {
-    throw new Error("The Excel library did not load. Check your connection.");
+    throw new Error("Excel library did not load. Check your connection.");
   }
 
-  const workbook = XLSX.utils.book_new();
+  const book = XLSX.utils.book_new();
 
   const summary = [
     ["Field", "Value"],
@@ -435,43 +706,40 @@ function workbookContent(s) {
     ["Opening carryover", s.carryoverCents / 100],
     ["Spent this week", s.spentCents / 100],
     ["Added this week", s.addedCents / 100],
-    ["Available", available(s) / 100],
+    ["Available", balance(s) / 100],
     ["Last updated", s.lastUpdated || ""]
   ];
 
   const history = [
-    ["ID", "Date", "Week", "Type", "Amount", "Available After", "Note"],
+    ["ID", "Date", "Local day", "Week", "Type", "Amount", "Balance", "Note"],
     ...s.entries.map(e => [
-      e.id,
-      e.date,
-      e.weekStart,
-      e.type,
-      e.amountCents / 100,
-      e.balanceCents / 100,
-      e.note || ""
+      e.id, e.date, e.localDate || key(new Date(e.date)),
+      e.weekStart, e.type, e.amountCents / 100,
+      e.balanceCents / 100, e.note || ""
     ])
   ];
 
-  XLSX.utils.book_append_sheet(
-    workbook, XLSX.utils.aoa_to_sheet(summary), "Summary"
-  );
+  const daily = [["Date", "Spent", "Added"]];
 
-  XLSX.utils.book_append_sheet(
-    workbook, XLSX.utils.aoa_to_sheet(history), "History"
-  );
+  for (const day of dailyTotals(s)) {
+    daily.push([day.date, day.spent / 100, day.added / 100]);
+  }
 
-  return XLSX.write(workbook, { bookType: "xlsx", type: "base64" });
+  for (const [name, rows] of [
+    ["Summary", summary],
+    ["History", history],
+    ["This Week", daily]
+  ]) {
+    XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(rows), name);
+  }
+
+  return XLSX.write(book, { bookType: "xlsx", type: "base64" });
 }
 
-async function writeExcel(path, message, s) {
-  const content = workbookContent(s);
+async function writeExcel(path, message) {
+  const content = workbook(state);
   const existing = await api(path);
-
-  const body = {
-    message,
-    branch: CONFIG.branch,
-    content
-  };
+  const body = { message, branch: CONFIG.branch, content };
 
   if (existing) body.sha = existing.sha;
 
@@ -481,125 +749,211 @@ async function writeExcel(path, message, s) {
   });
 }
 
-async function exportAndBackup(forceBackup = false) {
+async function exportFiles(forceBackup = false) {
   try {
-    status("Budget saved. Updating Excel…");
-
-    await writeExcel(
-      CONFIG.excelPath,
-      "Update budget Excel export",
-      state
-    );
+    setStatus("Budget saved. Updating Excel…");
+    await writeExcel(CONFIG.excelPath, "Update budget Excel export");
 
     const due = state.transactions - state.lastBackupTransaction
       >= CONFIG.backupEvery;
 
     if (forceBackup || due) {
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const path =
-        `${CONFIG.backupFolder}/budget-${stamp}-${entryId()}.xlsx`;
 
-      await writeExcel(path, "Create budget backup", state);
+      await writeExcel(
+        `${CONFIG.backupFolder}/budget-${stamp}-${id()}.xlsx`,
+        "Create budget backup"
+      );
 
-      // Persist the backup counter without replacing newer remote data.
       const candidate = structuredClone(state);
       candidate.lastBackupTransaction = candidate.transactions;
 
-      const sha = await commitState(
-        candidate, stateSha, "Record successful budget backup"
+      const sha = await saveState(
+        candidate, stateSha, "Record successful Excel backup"
       );
 
       state = candidate;
       stateSha = sha;
-      status("Budget, Excel export, and backup saved.");
+      setStatus("Budget, Excel, and backup saved.");
     } else {
-      status("Budget and Excel export saved.");
+      setStatus("Saved to GitHub · " + new Date().toLocaleTimeString());
     }
   } catch (error) {
-    status(
-      "Your budget is saved in budget.json, but the Excel export or " +
-      "backup needs retrying.\n" + error.message
+    setStatus(
+      "Your budget is saved in budget.json, but Excel or backup needs retrying.\n" +
+      error.message
     );
+  }
+}
+
+function dailyTotals(s = state) {
+  const days = Array.from({ length: 7 }, (_, i) => ({
+    date: shiftDay(s.weekStart, i),
+    spent: 0,
+    added: 0
+  }));
+
+  const map = new Map(days.map(day => [day.date, day]));
+
+  for (const e of s.entries) {
+    if (e.type !== "Spend" && e.type !== "Add Money") continue;
+
+    const date = e.localDate || key(new Date(e.date));
+    const day = map.get(date);
+    if (!day) continue;
+
+    if (e.type === "Spend") day.spent += e.amountCents;
+    else day.added += e.amountCents;
+  }
+
+  return days;
+}
+
+function renderDays() {
+  const days = dailyTotals();
+  const max = Math.max(1, ...days.map(day => day.spent));
+  const today = key(new Date());
+
+  $("days").replaceChildren();
+
+  for (const day of days) {
+    const date = parseDay(day.date);
+    const card = document.createElement("div");
+    card.className = "day" +
+      (day.date === today ? " today" : "") +
+      (day.date > today ? " future" : "");
+
+    const name = document.createElement("div");
+    name.className = "day-name";
+    name.textContent = date.toLocaleDateString("en-CA", { weekday: "short" });
+
+    const number = document.createElement("div");
+    number.className = "day-date";
+    number.textContent = date.getDate();
+
+    const track = document.createElement("div");
+    track.className = "bar-track";
+
+    const bar = document.createElement("div");
+    bar.className = "bar";
+    bar.style.height = `${Math.max(3, day.spent / max * 48)}px`;
+    track.append(bar);
+
+    const spent = document.createElement("div");
+    spent.className = "day-spend";
+    spent.textContent = day.date > today ? "—" : money(day.spent);
+
+    const added = document.createElement("div");
+    added.className = "day-add";
+    added.textContent = day.added ? "+" + money(day.added) : "";
+
+    card.append(name, number, track, spent, added);
+    $("days").append(card);
   }
 }
 
 function render() {
   if (!state) return;
 
-  const balance = available();
-  $("balance").textContent = money(balance);
-  $("balance").className = "balance " + (
-    balance < 0 ? "negative" : balance === 0 ? "zero" : "positive"
-  );
+  const remaining = balance();
+  const dayIndex = (new Date().getDay() + 6) % 7;
+  const daysLeft = 7 - dayIndex;
 
-  $("week").textContent = parseDate(state.weekStart).toLocaleDateString();
+  $("balance").textContent = money(remaining);
+  $("balance").className = "balance " + (remaining < 0 ? "negative" : "positive");
+
+  $("dailyGuide").textContent =
+    money(Math.floor(Math.max(0, remaining) / daysLeft)) + " / day";
+
+  $("nextAllowance").textContent =
+    parseDay(shiftDay(state.weekStart, 7)).toLocaleDateString("en-CA", {
+      weekday: "short", month: "short", day: "numeric"
+    });
+
+  $("weekLabel").textContent =
+    parseDay(state.weekStart).toLocaleDateString("en-CA", {
+      month: "short", day: "numeric"
+    });
+
   $("carryover").textContent = money(state.carryoverCents);
   $("spent").textContent = money(state.spentCents);
   $("added").textContent = money(state.addedCents);
-  $("available").textContent = money(balance);
+  $("entryCount").textContent = state.transactions + " money entries";
 
-  notice(balance <= 0
-    ? "Budget limit reached. Further spending increases your negative balance."
+  showNotice(remaining <= 0
+    ? "Budget limit reached. More spending increases your negative balance."
     : ""
   );
 
+  renderDays();
   $("history").replaceChildren();
 
-  for (const e of state.entries.slice(-30).reverse()) {
-    const div = document.createElement("div");
-    div.className = "entry";
+  const recent = state.entries.slice(-25).reverse();
 
+  if (!recent.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "No entries yet. Your week starts with $60.";
+    $("history").append(empty);
+  }
+
+  for (const e of recent) {
+    const row = document.createElement("div");
+    row.className = "entry";
+
+    const left = document.createElement("div");
     const title = document.createElement("div");
-    title.textContent =
-      `${e.type}: ${money(e.amountCents)} — Balance: ${money(e.balanceCents)}`;
+    title.className = "entry-title";
+    title.textContent = e.note || e.type;
 
-    const details = document.createElement("small");
+    const details = document.createElement("div");
+    details.className = "entry-details";
     details.textContent =
-      `${new Date(e.date).toLocaleString()}${e.note ? " • " + e.note : ""}`;
+      (e.type === "Week Start"
+        ? e.weekStart
+        : new Date(e.date).toLocaleString()) +
+      " · " + e.type;
 
-    div.append(title, details);
-    $("history").append(div);
+    left.append(title, details);
+
+    const right = document.createElement("div");
+    right.className = "entry-amount " +
+      (e.type === "Spend" ? "negative" : "positive");
+
+    right.textContent =
+      (e.type === "Spend" ? "−" : "+") + money(e.amountCents);
+
+    const after = document.createElement("div");
+    after.className = "entry-details";
+    after.textContent = "Balance " + money(e.balanceCents);
+    right.append(after);
+
+    row.append(left, right);
+    $("history").append(row);
   }
 }
 
-async function refreshInternal() {
-  const loaded = await readState();
-  const candidate = loaded.state;
-  const changed = addWeeks(candidate);
-
+async function syncState() {
+  const loaded = await loadState();
+  const candidate = loaded.data;
+  const changed = advanceWeeks(candidate);
   let sha = loaded.sha;
 
   if (changed || !sha) {
-    sha = await commitState(candidate, sha, "Initialize or advance weekly budget");
+    sha = await saveState(candidate, sha, "Initialize or advance weekly budget");
   }
 
   state = candidate;
   stateSha = sha;
   render();
-
   return changed || !loaded.sha;
-}
-
-async function refreshBudget() {
-  if (busy) return;
-  setBusy(true);
-
-  try {
-    status("Refreshing budget…");
-    await refreshInternal();
-    await exportAndBackup();
-  } catch (error) {
-    status(error.message);
-  } finally {
-    setBusy(false);
-  }
 }
 
 function parseAmount(value) {
   const text = String(value).trim();
 
   if (!/^\d+(?:\.\d{1,2})?$/.test(text)) {
-    throw new Error("Enter a positive amount with no more than two decimal places.");
+    throw new Error("Enter a positive amount with up to two decimal places.");
   }
 
   const cents = Math.round(Number(text) * 100);
@@ -611,20 +965,23 @@ function parseAmount(value) {
   return cents;
 }
 
-async function recordTransaction(type, amount, note, shortcutId = "") {
-  // Always read the latest repository data before applying a change.
-  const loaded = await readState();
-  const candidate = loaded.state;
-  addWeeks(candidate);
+async function record(type, amount, note, shortcutId = "") {
+  const loaded = await loadState();
+  const candidate = loaded.data;
+  const rolled = advanceWeeks(candidate);
 
-  if (
-    shortcutId &&
-    candidate.processedShortcutIds.includes(shortcutId)
-  ) {
+  if (shortcutId && candidate.processedShortcutIds.includes(shortcutId)) {
+    let sha = loaded.sha;
+
+    if (rolled) {
+      sha = await saveState(candidate, sha, "Advance weekly budget");
+    }
+
     state = candidate;
-    stateSha = loaded.sha;
+    stateSha = sha;
     render();
-    status("This Shortcut entry was already saved. It was not added twice.");
+    setStatus("This Shortcut entry was already saved. No duplicate was added.");
+    if (rolled) await exportFiles();
     return;
   }
 
@@ -632,25 +989,22 @@ async function recordTransaction(type, amount, note, shortcutId = "") {
   else candidate.addedCents += amount;
 
   candidate.transactions++;
-
   candidate.entries.push({
-    id: shortcutId || entryId(),
+    id: shortcutId || id(),
     date: new Date().toISOString(),
+    localDate: key(new Date()),
     weekStart: candidate.weekStart,
     type: type === "spend" ? "Spend" : "Add Money",
     amountCents: amount,
-    balanceCents: available(candidate),
+    balanceCents: balance(candidate),
     note
   });
 
-  if (shortcutId) {
-    candidate.processedShortcutIds.push(shortcutId);
-  }
+  if (shortcutId) candidate.processedShortcutIds.push(shortcutId);
 
-  status("Saving transaction…");
+  setStatus("Saving entry…");
 
-  // Do not change the displayed balance until GitHub accepts the write.
-  const sha = await commitState(
+  const sha = await saveState(
     candidate,
     loaded.sha,
     `${type === "spend" ? "Spend" : "Add"} ${money(amount)}`
@@ -658,12 +1012,12 @@ async function recordTransaction(type, amount, note, shortcutId = "") {
 
   state = candidate;
   stateSha = sha;
-  render();
 
   $("amount").value = "";
   $("note").value = "";
+  render();
 
-  await exportAndBackup();
+  await exportFiles();
 }
 
 async function submitEntry(type) {
@@ -673,19 +1027,34 @@ async function submitEntry(type) {
   try {
     amount = parseAmount($("amount").value);
   } catch (error) {
-    status(error.message);
+    setStatus(error.message);
     return;
   }
 
   setBusy(true);
 
   try {
-    await recordTransaction(type, amount, $("note").value.trim());
+    await record(type, amount, $("note").value.trim());
   } catch (error) {
-    status(
-      "Could not confirm this transaction was saved. Refresh and check " +
-      "the history before retrying.\n" + error.message
+    setStatus(
+      "Could not confirm the entry was saved. Refresh and check history " +
+      "before retrying.\n" + error.message
     );
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function refreshBudget() {
+  if (busy) return;
+  setBusy(true);
+
+  try {
+    setStatus("Refreshing…");
+    await syncState();
+    await exportFiles();
+  } catch (error) {
+    setStatus(error.message);
   } finally {
     setBusy(false);
   }
@@ -696,72 +1065,148 @@ async function backupNow() {
   setBusy(true);
 
   try {
-    await refreshInternal();
-    await exportAndBackup(true);
+    await syncState();
+    await exportFiles(true);
   } catch (error) {
-    status(error.message);
+    setStatus(error.message);
   } finally {
     setBusy(false);
   }
 }
 
+function showLogin(message = "") {
+  $("overlay").style.display = "flex";
+  $("spinner").style.display = "none";
+  $("loadingTitle").textContent = "Connect your tracker";
+  $("loadingText").textContent =
+    "Enter your GitHub token once to remember this device.";
+  $("login").style.display = "block";
+  $("loginError").textContent = message;
+}
+
+function forgetToken() {
+  if (busy) return;
+  if (!confirm("Remove the saved token from this browser?")) return;
+
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    token = "";
+    state = null;
+    stateSha = null;
+    setBusy(true);
+    $("tokenInput").value = "";
+    showLogin();
+  } catch (error) {
+    setStatus("Could not remove token: " + error.message);
+  }
+}
+
 async function handleShortcut() {
   const params = new URLSearchParams(location.search);
-  const hasSpend = params.has("spend");
-  const hasAdd = params.has("add");
+  const spend = params.has("spend");
+  const add = params.has("add");
 
-  if (!hasSpend && !hasAdd) return;
+  if (!spend && !add) return;
+  if (spend && add) throw new Error("Use either spend or add, not both.");
 
-  if (hasSpend && hasAdd) {
-    throw new Error("Use either spend or add in a Shortcut URL, not both.");
-  }
-
-  const type = hasSpend ? "spend" : "add";
+  const type = spend ? "spend" : "add";
   const amount = parseAmount(params.get(type));
-  const id = params.get("id") || entryId();
-  const note = (params.get("note") || "Apple Shortcut").slice(0, 200);
+  const shortcutId = params.get("id") || id();
 
-  // Keep a stable ID in the URL until saving finishes.
-  params.set("id", id);
+  params.set("id", shortcutId);
+
   history.replaceState(
     null, "", location.pathname + "?" + params.toString() + location.hash
   );
 
-  await recordTransaction(type, amount, note, id);
+  await record(
+    type,
+    amount,
+    (params.get("note") || "Apple Shortcut").slice(0, 200),
+    shortcutId
+  );
 
-  // Remove transaction parameters only after the transaction is handled.
   history.replaceState(null, "", location.pathname + location.hash);
 }
 
-async function start() {
+async function connect() {
   setBusy(true);
+  $("spinner").style.display = "block";
+  $("login").style.display = "none";
+  $("loadingTitle").textContent = "Loading your budget";
+  $("loadingText").textContent = "Checking GitHub and building your weekly view…";
 
-  token = (prompt(
-    "Paste your GitHub fine-grained token.\n\n" +
-    "It is kept only in this page's memory, not saved in the repository."
-  ) || "").trim();
+  try {
+    const updated = await syncState();
 
+    let storageWarning = "";
+    try {
+      localStorage.setItem(TOKEN_KEY, token);
+    } catch {
+      storageWarning =
+        "\nThis browser could not remember your token. It is usable for this visit.";
+    }
+
+    $("overlay").style.display = "none";
+
+    const params = new URLSearchParams(location.search);
+
+    if (params.has("spend") || params.has("add")) {
+      await handleShortcut();
+    } else if (updated) {
+      await exportFiles();
+    } else {
+      setStatus("Connected · Budget up to date");
+    }
+
+    if (storageWarning) {
+      setStatus($("status").textContent + storageWarning);
+    }
+  } catch (error) {
+    if (state) {
+      $("overlay").style.display = "none";
+      setStatus(
+        "Check history before retrying a transaction.\n" + error.message
+      );
+    } else {
+      showLogin(error.message);
+    }
+  } finally {
+    setBusy(false);
+  }
+}
+
+$("login").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (busy) return;
+
+  token = $("tokenInput").value.trim();
   if (!token) {
-    status("No token entered. Reload the page to try again.");
+    $("loginError").textContent = "Enter your token first.";
     return;
   }
 
+  $("tokenInput").value = "";
+  await connect();
+});
+
+async function start() {
+  $("todayLabel").textContent = new Date().toLocaleDateString("en-CA", {
+    weekday: "long", month: "long", day: "numeric"
+  });
+
+  setBusy(true);
+
   try {
-    const updated = await refreshInternal();
+    token = localStorage.getItem(TOKEN_KEY) || "";
+  } catch {
+    token = "";
+  }
 
-    const params = new URLSearchParams(location.search);
-    const hasTransaction = params.has("spend") || params.has("add");
-
-    if (hasTransaction) {
-      await handleShortcut();
-    } else if (updated) {
-      await exportAndBackup();
-    } else {
-      status("Budget loaded. Ready.");
-    }
-  } catch (error) {
-    status(error.message);
-  } finally {
+  if (token) {
+    await connect();
+  } else {
+    showLogin();
     setBusy(false);
   }
 }
