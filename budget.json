@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "weekStart": "2026-10-19",
+  "carryoverCents": 0,
+  "spentCents": 0,
+  "addedCents": 0,
+  "transactions": 0,
+  "lastBackupTransaction": 0,
+  "entries": [],
+  "processedShortcutIds": [],
+  "lastUpdated": "2026-10-19T22:24:03.601Z",
+  "available": 60,
+  "carryover": 0,
+  "spentThisWeek": 0,
+  "addedThisWeek": 0,
+  "weeklyAllowance": 60
+}
