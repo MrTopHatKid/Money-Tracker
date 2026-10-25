@@ -3,8 +3,8 @@
   "weekStart": "2026-10-19",
   "carryoverCents": 0,
   "spentCents": 1580,
-  "addedCents": 15000,
-  "transactions": 5,
+  "addedCents": 24796,
+  "transactions": 6,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -24,14 +24,23 @@
       "amountCents": 1580,
       "balanceCents": 19420,
       "note": "Repayed Mc"
+    },
+    {
+      "id": "d6c3eb61-8f7c-4a5e-91a7-76cd89942ab5",
+      "date": "2026-10-25T17:50:55.238Z",
+      "weekStart": "2026-10-19",
+      "type": "Add Money",
+      "amountCents": 9796,
+      "balanceCents": 29216,
+      "note": ""
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-19T23:14:12.420Z",
-  "available": 194.2,
+  "lastUpdated": "2026-10-25T17:50:55.239Z",
+  "available": 292.16,
   "carryover": 0,
   "spentThisWeek": 15.8,
-  "addedThisWeek": 150,
+  "addedThisWeek": 247.96,
   "weeklyAllowance": 60,
   "deletedEntries": [
     {
