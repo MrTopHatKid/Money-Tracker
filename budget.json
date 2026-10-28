@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "weekStart": "2026-10-19",
-  "carryoverCents": 0,
-  "spentCents": 1580,
-  "addedCents": 24796,
+  "weekStart": "2026-10-26",
+  "carryoverCents": 29216,
+  "spentCents": 0,
+  "addedCents": 0,
   "transactions": 6,
   "lastBackupTransaction": 0,
   "entries": [
@@ -33,14 +33,23 @@
       "amountCents": 9796,
       "balanceCents": 29216,
       "note": ""
+    },
+    {
+      "id": "63bcf40f-120f-4ca0-bc03-0f77b705e1f5",
+      "date": "2026-10-28T01:53:22.546Z",
+      "weekStart": "2026-10-26",
+      "type": "Week Start",
+      "amountCents": 6000,
+      "balanceCents": 35216,
+      "note": "Weekly allowance added; previous balance carried forward."
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-25T17:50:55.239Z",
-  "available": 292.16,
-  "carryover": 0,
-  "spentThisWeek": 15.8,
-  "addedThisWeek": 247.96,
+  "lastUpdated": "2026-10-28T01:53:22.546Z",
+  "available": 352.16,
+  "carryover": 292.16,
+  "spentThisWeek": 0,
+  "addedThisWeek": 0,
   "weeklyAllowance": 60,
   "deletedEntries": [
     {
