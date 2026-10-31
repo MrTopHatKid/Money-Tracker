@@ -3,8 +3,8 @@
   "weekStart": "2026-10-26",
   "carryoverCents": 35216,
   "spentCents": 0,
-  "addedCents": 0,
-  "transactions": 6,
+  "addedCents": 43951,
+  "transactions": 7,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -42,15 +42,25 @@
       "amountCents": 6000,
       "balanceCents": 35216,
       "note": "Weekly allowance added; previous balance carried forward."
+    },
+    {
+      "id": "c2964534-e6f5-4082-a6dc-c112fed128e6",
+      "date": "2026-10-31T16:55:00.211Z",
+      "weekStart": "2026-10-26",
+      "type": "Net Pay",
+      "netPayCents": 146502,
+      "amountCents": 43951,
+      "balanceCents": 79167,
+      "note": "Net pay: $1,465.02 — 30% to spending"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-31T16:44:16.853Z",
-  "available": 352.16,
+  "lastUpdated": "2026-10-31T16:55:00.212Z",
+  "available": 791.67,
   "carryover": 352.16,
   "spentThisWeek": 0,
-  "addedThisWeek": 0,
-  "weeklyAllowance": 60,
+  "addedThisWeek": 439.51,
+  "weeklyAllowance": 0,
   "deletedEntries": [
     {
       "id": "84bb21af-aa25-4817-9f92-87c15e5c3292",
@@ -86,5 +96,6 @@
   "openingCents": 6000,
   "weeklyAllowanceRetired": true,
   "allowanceRetiredAt": "2026-10-31T16:44:16.853Z",
-  "netPayPercentToSpending": 30
+  "netPayPercentToSpending": 30,
+  "netPaySpendingPercent": 30
 }
