@@ -1,7 +1,7 @@
 {
   "version": 2,
   "weekStart": "2026-10-26",
-  "carryoverCents": 29216,
+  "carryoverCents": 35216,
   "spentCents": 0,
   "addedCents": 0,
   "transactions": 6,
@@ -45,9 +45,9 @@
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-28T01:53:22.546Z",
+  "lastUpdated": "2026-10-31T16:44:16.853Z",
   "available": 352.16,
-  "carryover": 292.16,
+  "carryover": 352.16,
   "spentThisWeek": 0,
   "addedThisWeek": 0,
   "weeklyAllowance": 60,
@@ -82,5 +82,9 @@
       "note": "",
       "deletedAt": "2026-10-19T23:09:40.493Z"
     }
-  ]
+  ],
+  "openingCents": 6000,
+  "weeklyAllowanceRetired": true,
+  "allowanceRetiredAt": "2026-10-31T16:44:16.853Z",
+  "netPayPercentToSpending": 30
 }
