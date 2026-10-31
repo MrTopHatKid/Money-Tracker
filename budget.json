@@ -3,8 +3,8 @@
   "weekStart": "2026-10-26",
   "carryoverCents": 35216,
   "spentCents": 0,
-  "addedCents": 43951,
-  "transactions": 7,
+  "addedCents": 53747,
+  "transactions": 8,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -52,14 +52,23 @@
       "amountCents": 43951,
       "balanceCents": 79167,
       "note": "Net pay: $1,465.02 — 30% to spending"
+    },
+    {
+      "id": "bc7dd91a-215e-4d13-aa0f-6c6a47b725fb",
+      "date": "2026-10-31T17:43:37.731Z",
+      "weekStart": "2026-10-26",
+      "type": "Add Money",
+      "amountCents": 9796,
+      "balanceCents": 88963,
+      "note": ""
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-10-31T16:55:00.212Z",
-  "available": 791.67,
+  "lastUpdated": "2026-10-31T17:43:37.731Z",
+  "available": 889.63,
   "carryover": 352.16,
   "spentThisWeek": 0,
-  "addedThisWeek": 439.51,
+  "addedThisWeek": 537.47,
   "weeklyAllowance": 0,
   "deletedEntries": [
     {
