@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-02",
   "carryoverCents": 88963,
-  "spentCents": 28136,
+  "spentCents": 32603,
   "addedCents": 0,
-  "transactions": 9,
+  "transactions": 10,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -70,13 +70,22 @@
       "amountCents": 28136,
       "balanceCents": 60827,
       "note": "Repay Muffin Man - headset 2026"
+    },
+    {
+      "id": "3c70dddb-825e-4062-abc1-e646f7261ada",
+      "date": "2026-11-07T22:15:04.766Z",
+      "weekStart": "2026-11-02",
+      "type": "Spend",
+      "amountCents": 4467,
+      "balanceCents": 56360,
+      "note": "Groceries"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-02T22:21:07.420Z",
-  "available": 608.27,
+  "lastUpdated": "2026-11-07T22:15:04.767Z",
+  "available": 563.6,
   "carryover": 889.63,
-  "spentThisWeek": 281.36,
+  "spentThisWeek": 326.03,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
