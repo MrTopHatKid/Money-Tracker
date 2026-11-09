@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-09",
   "carryoverCents": 56360,
-  "spentCents": 0,
+  "spentCents": 2000,
   "addedCents": 0,
-  "transactions": 10,
+  "transactions": 11,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -79,13 +79,22 @@
       "amountCents": 4467,
       "balanceCents": 56360,
       "note": "Groceries"
+    },
+    {
+      "id": "e20d43c3-f302-482d-aac0-bf1537ad98d4",
+      "date": "2026-11-09T18:35:11.432Z",
+      "weekStart": "2026-11-09",
+      "type": "Spend",
+      "amountCents": 2000,
+      "balanceCents": 54360,
+      "note": "Loan to McKayla"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-09T18:34:59.017Z",
-  "available": 563.6,
+  "lastUpdated": "2026-11-09T18:35:11.433Z",
+  "available": 543.6,
   "carryover": 563.6,
-  "spentThisWeek": 0,
+  "spentThisWeek": 20,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
