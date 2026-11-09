@@ -1,0 +1,137 @@
+{
+  "version": 2,
+  "weekStart": "2026-11-09",
+  "carryoverCents": 56360,
+  "spentCents": 2000,
+  "addedCents": 0,
+  "transactions": 11,
+  "lastBackupTransaction": 0,
+  "entries": [
+    {
+      "id": "d2ca695b-1db0-4f1e-b87b-5815d066de80",
+      "date": "2026-10-19T23:10:00.410Z",
+      "weekStart": "2026-10-19",
+      "type": "Add Money",
+      "amountCents": 15000,
+      "balanceCents": 21000,
+      "note": ""
+    },
+    {
+      "id": "51d54c1f-0e31-4b67-a30e-955cc13fca20",
+      "date": "2026-10-19T23:14:12.419Z",
+      "weekStart": "2026-10-19",
+      "type": "Spend",
+      "amountCents": 1580,
+      "balanceCents": 19420,
+      "note": "Repayed Mc"
+    },
+    {
+      "id": "d6c3eb61-8f7c-4a5e-91a7-76cd89942ab5",
+      "date": "2026-10-25T17:50:55.238Z",
+      "weekStart": "2026-10-19",
+      "type": "Add Money",
+      "amountCents": 9796,
+      "balanceCents": 29216,
+      "note": ""
+    },
+    {
+      "id": "63bcf40f-120f-4ca0-bc03-0f77b705e1f5",
+      "date": "2026-10-28T01:53:22.546Z",
+      "weekStart": "2026-10-26",
+      "type": "Week Start",
+      "amountCents": 6000,
+      "balanceCents": 35216,
+      "note": "Weekly allowance added; previous balance carried forward."
+    },
+    {
+      "id": "c2964534-e6f5-4082-a6dc-c112fed128e6",
+      "date": "2026-10-31T16:55:00.211Z",
+      "weekStart": "2026-10-26",
+      "type": "Net Pay",
+      "netPayCents": 146502,
+      "amountCents": 43951,
+      "balanceCents": 79167,
+      "note": "Net pay: $1,465.02 — 30% to spending"
+    },
+    {
+      "id": "bc7dd91a-215e-4d13-aa0f-6c6a47b725fb",
+      "date": "2026-10-31T17:43:37.731Z",
+      "weekStart": "2026-10-26",
+      "type": "Add Money",
+      "amountCents": 9796,
+      "balanceCents": 88963,
+      "note": ""
+    },
+    {
+      "id": "ef233f1d-06b3-4d8e-a597-fef2fe4604a9",
+      "date": "2026-11-02T22:21:07.419Z",
+      "weekStart": "2026-11-02",
+      "type": "Spend",
+      "amountCents": 28136,
+      "balanceCents": 60827,
+      "note": "Repay Muffin Man - headset 2026"
+    },
+    {
+      "id": "3c70dddb-825e-4062-abc1-e646f7261ada",
+      "date": "2026-11-07T22:15:04.766Z",
+      "weekStart": "2026-11-02",
+      "type": "Spend",
+      "amountCents": 4467,
+      "balanceCents": 56360,
+      "note": "Groceries"
+    },
+    {
+      "id": "e20d43c3-f302-482d-aac0-bf1537ad98d4",
+      "date": "2026-11-09T18:35:11.432Z",
+      "weekStart": "2026-11-09",
+      "type": "Spend",
+      "amountCents": 2000,
+      "balanceCents": 54360,
+      "note": "Loan to McKayla"
+    }
+  ],
+  "processedShortcutIds": [],
+  "lastUpdated": "2026-11-09T18:35:11.433Z",
+  "available": 543.6,
+  "carryover": 563.6,
+  "spentThisWeek": 20,
+  "addedThisWeek": 0,
+  "weeklyAllowance": 0,
+  "deletedEntries": [
+    {
+      "id": "84bb21af-aa25-4817-9f92-87c15e5c3292",
+      "date": "2026-10-19T23:02:11.567Z",
+      "weekStart": "2026-10-19",
+      "type": "Spend",
+      "amountCents": 1800,
+      "balanceCents": 3200,
+      "note": "",
+      "deletedAt": "2026-10-19T23:07:48.841Z"
+    },
+    {
+      "id": "64487cc7-f993-4ae1-a49a-e6bcad363c16",
+      "date": "2026-10-19T22:52:54.000Z",
+      "weekStart": "2026-10-19",
+      "type": "Spend",
+      "amountCents": 1000,
+      "balanceCents": 5000,
+      "note": "",
+      "deletedAt": "2026-10-19T23:07:54.049Z"
+    },
+    {
+      "id": "1283167a-89ed-4a94-b069-785eaf843774",
+      "date": "2026-10-19T23:08:35.453Z",
+      "weekStart": "2026-10-19",
+      "type": "Add Money",
+      "amountCents": 20000,
+      "balanceCents": 26000,
+      "note": "",
+      "deletedAt": "2026-10-19T23:09:40.493Z"
+    }
+  ],
+  "openingCents": 6000,
+  "weeklyAllowanceRetired": true,
+  "allowanceRetiredAt": "2026-10-31T16:44:16.853Z",
+  "netPayPercentToSpending": 30,
+  "netPaySpendingPercent": 30
+}
