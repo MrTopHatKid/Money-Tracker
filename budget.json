@@ -3,8 +3,8 @@
   "weekStart": "2026-11-09",
   "carryoverCents": 56360,
   "spentCents": 2000,
-  "addedCents": 0,
-  "transactions": 11,
+  "addedCents": 51630,
+  "transactions": 12,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -89,14 +89,24 @@
       "balanceCents": 54360,
       "note": "Loan to Mc",
       "editedAt": "2026-11-09T18:35:42.620Z"
+    },
+    {
+      "id": "70872d47-9bb0-445c-b3e3-c5a96baf677d",
+      "date": "2026-11-12T11:47:29.117Z",
+      "weekStart": "2026-11-09",
+      "type": "Net Pay",
+      "netPayCents": 172099,
+      "amountCents": 51630,
+      "balanceCents": 105990,
+      "note": "Net pay: $1,720.99 — 30% to spending"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-09T18:35:42.621Z",
-  "available": 543.6,
+  "lastUpdated": "2026-11-12T11:47:29.118Z",
+  "available": 1059.9,
   "carryover": 563.6,
   "spentThisWeek": 20,
-  "addedThisWeek": 0,
+  "addedThisWeek": 516.3,
   "weeklyAllowance": 0,
   "deletedEntries": [
     {
