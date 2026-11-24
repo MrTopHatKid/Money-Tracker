@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "weekStart": "2026-11-16",
-  "carryoverCents": 107990,
-  "spentCents": 5432,
+  "weekStart": "2026-11-23",
+  "carryoverCents": 102558,
+  "spentCents": 0,
   "addedCents": 0,
   "transactions": 15,
   "lastBackupTransaction": 0,
@@ -129,10 +129,10 @@
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-19T01:06:21.041Z",
+  "lastUpdated": "2026-11-24T12:33:49.337Z",
   "available": 1025.58,
-  "carryover": 1079.9,
-  "spentThisWeek": 54.32,
+  "carryover": 1025.58,
+  "spentThisWeek": 0,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
