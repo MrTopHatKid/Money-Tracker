@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
-  "spentCents": 0,
+  "spentCents": 2892,
   "addedCents": 0,
-  "transactions": 15,
+  "transactions": 16,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -126,13 +126,22 @@
       "amountCents": 3501,
       "balanceCents": 102558,
       "note": "Gifts for mc"
+    },
+    {
+      "id": "f757610a-404b-4272-81f0-c969339928fb",
+      "date": "2026-11-24T12:34:07.917Z",
+      "weekStart": "2026-11-23",
+      "type": "Spend",
+      "amountCents": 2892,
+      "balanceCents": 99666,
+      "note": "Shoes and ring"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-24T12:33:49.337Z",
-  "available": 1025.58,
+  "lastUpdated": "2026-11-24T12:34:07.917Z",
+  "available": 996.66,
   "carryover": 1025.58,
-  "spentThisWeek": 0,
+  "spentThisWeek": 28.92,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
