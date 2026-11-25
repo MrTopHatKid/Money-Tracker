@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
-  "spentCents": 2892,
+  "spentCents": 3851,
   "addedCents": 0,
-  "transactions": 16,
+  "transactions": 17,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -135,13 +135,22 @@
       "amountCents": 2892,
       "balanceCents": 99666,
       "note": "Shoes and ring"
+    },
+    {
+      "id": "1db8ca4a-22b6-4aa8-8af4-4c80a13f92f6",
+      "date": "2026-11-25T11:48:50.686Z",
+      "weekStart": "2026-11-23",
+      "type": "Spend",
+      "amountCents": 959,
+      "balanceCents": 98707,
+      "note": "DVD player - pink"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-24T12:34:07.917Z",
-  "available": 996.66,
+  "lastUpdated": "2026-11-25T11:48:50.688Z",
+  "available": 987.07,
   "carryover": 1025.58,
-  "spentThisWeek": 28.92,
+  "spentThisWeek": 38.51,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
