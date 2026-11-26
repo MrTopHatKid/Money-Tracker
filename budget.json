@@ -3,8 +3,8 @@
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
   "spentCents": 10851,
-  "addedCents": 0,
-  "transactions": 18,
+  "addedCents": 50331,
+  "transactions": 19,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -153,14 +153,24 @@
       "amountCents": 7000,
       "balanceCents": 91707,
       "note": "Costco payback - MM"
+    },
+    {
+      "id": "5f14f346-47a2-4545-a2b3-92897c6e36be",
+      "date": "2026-11-26T23:07:17.109Z",
+      "weekStart": "2026-11-23",
+      "type": "Net Pay",
+      "netPayCents": 167770,
+      "amountCents": 50331,
+      "balanceCents": 142038,
+      "note": "Net pay: $1,677.70 — 30% to spending"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-26T23:05:05.556Z",
-  "available": 917.07,
+  "lastUpdated": "2026-11-26T23:07:17.109Z",
+  "available": 1420.38,
   "carryover": 1025.58,
   "spentThisWeek": 108.51,
-  "addedThisWeek": 0,
+  "addedThisWeek": 503.31,
   "weeklyAllowance": 0,
   "deletedEntries": [
     {
