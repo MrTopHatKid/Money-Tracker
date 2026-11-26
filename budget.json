@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
-  "spentCents": 3851,
+  "spentCents": 10851,
   "addedCents": 0,
-  "transactions": 17,
+  "transactions": 18,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -144,13 +144,22 @@
       "amountCents": 959,
       "balanceCents": 98707,
       "note": "DVD player - pink"
+    },
+    {
+      "id": "99043b66-1c6f-4948-be21-91d206166beb",
+      "date": "2026-11-26T23:05:05.555Z",
+      "weekStart": "2026-11-23",
+      "type": "Spend",
+      "amountCents": 7000,
+      "balanceCents": 91707,
+      "note": "Costco payback - MM"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-25T11:48:50.688Z",
-  "available": 987.07,
+  "lastUpdated": "2026-11-26T23:05:05.556Z",
+  "available": 917.07,
   "carryover": 1025.58,
-  "spentThisWeek": 38.51,
+  "spentThisWeek": 108.51,
   "addedThisWeek": 0,
   "weeklyAllowance": 0,
   "deletedEntries": [
