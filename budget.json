@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
-  "spentCents": 10851,
+  "spentCents": 40851,
   "addedCents": 50331,
-  "transactions": 19,
+  "transactions": 20,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -163,13 +163,22 @@
       "amountCents": 50331,
       "balanceCents": 142038,
       "note": "Net pay: $1,677.70 — 30% to spending"
+    },
+    {
+      "id": "a5dabfe6-089d-457b-a98c-f755cf6b060d",
+      "date": "2026-11-27T03:51:45.123Z",
+      "weekStart": "2026-11-23",
+      "type": "Spend",
+      "amountCents": 30000,
+      "balanceCents": 112038,
+      "note": "Keyboard"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-26T23:07:17.109Z",
-  "available": 1420.38,
+  "lastUpdated": "2026-11-27T03:51:45.124Z",
+  "available": 1120.38,
   "carryover": 1025.58,
-  "spentThisWeek": 108.51,
+  "spentThisWeek": 408.51,
   "addedThisWeek": 503.31,
   "weeklyAllowance": 0,
   "deletedEntries": [
