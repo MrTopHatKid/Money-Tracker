@@ -2,9 +2,9 @@
   "version": 2,
   "weekStart": "2026-11-23",
   "carryoverCents": 102558,
-  "spentCents": 40851,
+  "spentCents": 49882,
   "addedCents": 50331,
-  "transactions": 20,
+  "transactions": 21,
   "lastBackupTransaction": 0,
   "entries": [
     {
@@ -172,13 +172,22 @@
       "amountCents": 30000,
       "balanceCents": 112038,
       "note": "Keyboard"
+    },
+    {
+      "id": "1fed801e-4614-408c-96c2-dd96a5ae2c4e",
+      "date": "2026-11-28T00:10:32.138Z",
+      "weekStart": "2026-11-23",
+      "type": "Spend",
+      "amountCents": 9031,
+      "balanceCents": 103007,
+      "note": "Mc gift"
     }
   ],
   "processedShortcutIds": [],
-  "lastUpdated": "2026-11-27T03:51:45.124Z",
-  "available": 1120.38,
+  "lastUpdated": "2026-11-28T00:10:32.139Z",
+  "available": 1030.07,
   "carryover": 1025.58,
-  "spentThisWeek": 408.51,
+  "spentThisWeek": 498.82,
   "addedThisWeek": 503.31,
   "weeklyAllowance": 0,
   "deletedEntries": [
